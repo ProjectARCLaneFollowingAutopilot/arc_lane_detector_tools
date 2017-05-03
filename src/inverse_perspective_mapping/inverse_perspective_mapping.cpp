@@ -1,4 +1,4 @@
-#include "../include/inverse_perspective_mapping/inverse_perspective_mapping.hpp"
+#include "../../include/inverse_perspective_mapping/inverse_perspective_mapping.hpp"
 
 // GENERAL FUNCTIONS.
 // Callback function for setMouseCallback and returns the point clicked on.
