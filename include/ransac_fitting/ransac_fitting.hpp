@@ -10,14 +10,15 @@ Output shall be: Parameters of the fitted function.
 #include <vector>
 #include "opencv2/highgui/highgui.hpp"
 
+using namespace cv;
 
 // This struct stores all required informations of a specific consensus set.
 struct Consensus
 {
   // Random points, used for calculating this consensus set.
-  vector<Vec2f> random_points(3);
+  vector<Vec2f> random_points;  //(3);
   // Coefficients (a, b, c) of the polynom passing through the three random points.
-  std::vector<float> polynom_coeff(3); 
+  std::vector<float> polynom_coeff;   //(3); 
   // Consensus set.
   vector<Vec2f> cons_set;
   // Size of the consensus set.
@@ -28,12 +29,14 @@ class Ransac
 {
   public:
   // PUBLIC MEMBER METHODS.
+  // Standard constructor.
   Ransac();
+  // Standard destructor.
   ~Ransac();
-  // Some method to assign new data points.
-  setRansacDataSet(vector<Vec2f> &data_set);
+  // Method to assign new data points.
+  void setRansacDataSet(vector<Vec2f> &data_set);
   // Method to set the parameters of the RANSAC Algorithm (threshholds, number of iterations,...).
-  setRansacParams(float inlier_distance, int num_of_iterations, int min_size_consensus);
+  void setRansacParams(float max_inlier_distance, int max_num_of_iterations, int min_size_consensus);
   // Method which does the RANSAC algorithm and returns the found polynomial parameters -->Master function.
   vector<float> getRansacCoeff();
   // PUBLIC MEMBER VARIABLES.
@@ -41,11 +44,11 @@ class Ransac
   private:
   // PRIVATE MEMBER METHODS.
   // Method which choses a random points from the data set.
-  cv::Point2f getRandomPoint();
+  Point2f getRandomPoint();
   // Method which takes exactly the required number of points fits the polynom (-->fully determined) and returns the coefficients.
   std::vector<float> getCoeffDet(vector<Vec2f> det_points);  
   // Method which returns the absolute distance from a given polynomial.
-  float getDistancePointToPolynom(cv::Point2f point, vector<Vec2f> polynom_coeff);
+  float getDistancePointToPolynom(Point2f point, vector<Vec2f> polynom_coeff);
   // Method, which takes more than the required number of points, fits the polynom using LSQ (-->over determined) and returns the parameters.
   std::vector<float> getCoeffLSQ(vector<Vec2f> over_det_points); 
   // PRIVATE MEMBER VARIABLES.
