@@ -9,21 +9,33 @@ At the beginning: Only implement one curve type: 2nd order polynomial: f(x) = a*
 #include <cv.h>
 #include <iostream>
 #include "opencv2/highgui/highgui.hpp"
+#include <vector>
 
 
-// A new struct would be helpful: Stores parameters (Actually not needed) and the consensus set and size of the consensus set.
+// This struct stores all required informations of a specific consensus set.
+struct Consensus
+{
+  // Random points, used for calculating this consensus set.
+  vector<Vec2f> random_points;
+  // Coefficients (a, b, c) of the polynom passing through the three random points.
+  std::vector<float> polynom_coeff(3); 
+  // Consensus set.
+  vector<Vec2f> cons_set;
+  // Size of the consensus set.
+  int size_cons_set;
+};
 
-class RANSAC
+class Ransac
 {
   public:
   // PUBLIC MEMBER METHODS.
-  RANSAC();
-  ~RANSAC();
+  Ransac();
+  ~Ransac();
   // Some method to assign new data points.
   setRansacDataSet();
   // Method to set the parameters of the RANSAC Algorithm (threshholds, number of iterations,...).
   setRansacParams(float inlier_distance, int num_of_iterations, int min_size_consensus);
-  // Method which does the RANSAC algorithm and returns the found polynomial parameters.
+  // Method which does the RANSAC algorithm and returns the found polynomial parameters -->Master function.
   // PUBLIC MEMBER VARIABLES.
 
 
@@ -41,8 +53,10 @@ class RANSAC
   // PRIVATE MEMBER VARIABLES.
   // Vector which stores the data set of 2D pixel points.
 
+  // Vector which stores, temporarily, the three random points from the ongoing iteration.
   // Vector which stores, temporarily, the polynom parameters of the ongoing iteration.
-  // Vector of structs, storing the consensus set, parameters and size of consensus set.
+  // Vector of structs, storing all of the consensus set structs.
+  vector<Consensus> all_cons_sets;
   // The maximum allowed distance (define distance!) from the curve, such that point counted as inlier.
   float inlier_distance_; 
   // Number of maximal iterations to find fitting points.

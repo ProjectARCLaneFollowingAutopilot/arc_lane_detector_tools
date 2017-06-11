@@ -8,14 +8,14 @@ However, all are based on the hough line transform, but the images are preproces
 #include "opencv2/highgui/highgui.hpp"
 #include <cv.h>
 
-class LINEDETECTOR
+class LineDetector
 {
   public:
   // PUBLIC MEMBER METHODS.
   // Standard constructor.
-  LINEDETECTOR();
+  LineDetector();
   // Standard destructor.
-  ~LINEDETECTOR();
+  ~LineDetector();
   // Does the Hough-Transform and draws the lines.
   void houghTransform(Mat &contours, Mat &draw_to, vector<Vec2f> &lines_hT, int threshold);
 

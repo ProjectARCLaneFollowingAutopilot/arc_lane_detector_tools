@@ -2,17 +2,17 @@
 
  // PUBLIC MEMBER METHODS.
  // Standard constructor.
- LINEDETECTOR::LINEDETECTOR()
+ LineDetector::LineDetector()
  { 
  	std::cout<<"Linedetector created!"
  }
  // Standard destructor.
- LINEDETECTOR::~LINEDETECTOR()
+ LineDetector::~LineDetector()
  {
  	std::cout<<"Linedetector destroyed!"<<std::endl;
  }
  // Does the Hough-Transform and draws the lines.
- void LINEDETECTOR::houghTransform(Mat &contours, Mat &draw_to, vector<Vec2f> &lines_hT, int threshold)
+ void LineDetector::houghTransform(Mat &contours, Mat &draw_to, vector<Vec2f> &lines_hT, int threshold)
  {
  	//Hough transform.
  	HoughLines(contours, lines_hT, 1, CV_PI/180, threshold, 0, 0);
@@ -40,7 +40,7 @@
  // PRIVATE MEMBER METHODS.
 
  // Line finding methods.
- vector<Vec2f> LINEDETECTOR::HoughClassic (Mat &src_HC)
+ vector<Vec2f> LineDetector::HoughClassic (Mat &src_HC)
  {
  	// Filter the image.
   	Mat src_HC_roi_filtered = src_HC.clone();
@@ -55,7 +55,7 @@
   	houghTransform(contours, draw_detected_hough, lines_HC, 90);
   	return lines_HC;
  }
- vector<Vec2f> LINEDETECTOR::InRange (Mat src_IR)
+ vector<Vec2f> LineDetector::InRange (Mat src_IR)
  {
    	// Calculate a mask by using the openCV-function inRange.
   	Mat mask(src_IR.rows, src_IR.cols, CV_8UC1);
@@ -70,7 +70,7 @@
 	houghTransform(contours, src_IR ,lines_IR, 80);
 	return lines_IR;
  }
- vector<Vec2f> LINEDETECTOR::GrayProperty (Mat src_GP)
+ vector<Vec2f> LineDetector::GrayProperty (Mat src_GP)
  {
  	vector<Vec2f> lines_GP;
 	Mat contours(src_GP.rows, src_GP.cols, CV_8UC1);
@@ -80,7 +80,7 @@
 	houghTransform(contours, src_GP, lines_GP, 40);
 	return lines_GP;
  }
- vector<Vec2f> LINEDETECTOR::CompareGray (Mat src_CG);
+ vector<Vec2f> LineDetector::CompareGray (Mat src_CG);
 
  // Helper methods:
  Mat LINEDETECTOR::showChannel(Mat RGB, bool B, bool G, bool R);
