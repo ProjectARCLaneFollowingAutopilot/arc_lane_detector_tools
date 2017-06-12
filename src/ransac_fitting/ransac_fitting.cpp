@@ -1,17 +1,16 @@
 #include "../../include/ransac_fitting/ransac_fitting.hpp"
 
 // PUBLIC MEMBER METHODS.
-// DONE: Standard constructor.
+// DONE & TESTED: Standard constructor.
 Ransac::Ransac()
 {
 	std::srand(std::time(0)); // use current time as seed for random generator
 	std::cout<<"RANSAC Object created!"<<std::endl;
 }
-// DONE: Standard destructor.
+// DONE & TESTED: Standard destructor.
 Ransac::~Ransac()
 {
 	std::cout<<"RANSAC Object destroyed!"<<std::endl;
-
 }
 // DONE & TESTED: Method to assign new data points.
 void Ransac::setRansacDataSet(vector<cv::Point2f> &data_set)
@@ -45,7 +44,7 @@ void Ransac::setRansacParams(float max_inlier_distance, int max_num_of_iteration
 	this->min_size_consensus_ = min_size_consensus;
 }
 
-// DONE: Method which does the RANSAC algorithm and returns the found polynomial parameters -->Master function.
+// DONE & TESTED: Method which does the RANSAC algorithm and returns the found polynomial parameters -->Master function.
 vector<float> Ransac::getRansacCoeff()
 {
 	// Loop as many times as previously defined to generate the consensus sets.
@@ -94,13 +93,6 @@ vector<float> Ransac::getRansacCoeff()
 	// Return the found coefficients.
 	return this->Ransac::getCoeffLSQ(this->largest_consensus_set_.cons_set); 
 }
-
- // ONLY FOR TESTING.
- void Ransac::testFunction()
- {
-
- }
-
 
 // PRIVATE MEMBER METHODS.
 

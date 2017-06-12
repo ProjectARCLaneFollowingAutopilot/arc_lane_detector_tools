@@ -24,7 +24,7 @@ struct Consensus
   // Random points, used for calculating this consensus set.
   vector<Point2f> random_points; 
   // Coefficients (a, b, c) of the polynom passing through the three random points.
-  vector<float> polynom_coeff;   //(3); 
+  vector<float> polynom_coeff;
   // Consensus set.
   vector<Point2f> cons_set;
   // Size of the consensus set.
@@ -45,9 +45,6 @@ class Ransac
   void setRansacParams(float max_inlier_distance, int max_num_of_iterations, int min_size_consensus);
   // DONE: Method which does the RANSAC algorithm and returns the found polynomial parameters -->Master function.
   vector<float> getRansacCoeff();
-
-  // ONLY FOR TESTING.
-  void testFunction();
 
   // PUBLIC MEMBER VARIABLES.
 
