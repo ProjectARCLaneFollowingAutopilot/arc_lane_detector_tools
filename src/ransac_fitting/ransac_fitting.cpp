@@ -4,6 +4,7 @@
 // DONE: Standard constructor.
 Ransac::Ransac()
 {
+	std::srand(std::time(0)); // use current time as seed for random generator
 	std::cout<<"RANSAC Object created!"<<std::endl;
 }
 // DONE: Standard destructor.
@@ -12,13 +13,13 @@ Ransac::~Ransac()
 	std::cout<<"RANSAC Object destroyed!"<<std::endl;
 
 }
-// DONE: Method to assign new data points.
+// DONE & TESTED: Method to assign new data points.
 void Ransac::setRansacDataSet(vector<cv::Point2f> &data_set)
 {
 	// Copy the dataset.
 	this->data_set_ = data_set;
-	int x_min_dataset = 10000;
-	int x_max_dataset = -1000;
+	float x_min_dataset = 10000;
+	float x_max_dataset = -1000;
 	// Find the minimal and maximal x-coordinates in the data set.
 	for(int i = 0; i < this->data_set_.size(); i++)
 	{
@@ -36,7 +37,7 @@ void Ransac::setRansacDataSet(vector<cv::Point2f> &data_set)
 	this->x_max_dataset_ = x_max_dataset;
 }
 
-// DONE: Method to set the parameters of the RANSAC Algorithm (threshholds, number of iterations,...).
+// DONE & TESTED: Method to set the parameters of the RANSAC Algorithm (threshholds, number of iterations,...).
 void Ransac::setRansacParams(float max_inlier_distance, int max_num_of_iterations, int min_size_consensus)
 {
 	this->max_inlier_distance_ = max_inlier_distance;
@@ -90,24 +91,43 @@ vector<float> Ransac::getRansacCoeff()
 		}
 	}
 
-	// Do least square to find the final coefficients.
-
 	// Return the found coefficients.
-
+	return this->Ransac::getCoeffLSQ(this->largest_consensus_set_.cons_set); 
 }
+
+ // ONLY FOR TESTING.
+ void Ransac::testFunction()
+ {
+	vector<Point2f> test_det;
+ 	for(int i = 0; i<15; i++)
+ 	{
+ 		Point2f test_punkt = this->getRandomPoint();
+ 		test_det.push_back(test_punkt);
+ 	}
+	/*
+ 	vector<float> coeffs = this->Ransac::getCoeffDet(test_det);
+ 	std::cout<<"a: " <<coeffs[0]<<std::endl;
+ 	std::cout<<"b: " <<coeffs[1]<<std::endl;
+ 	std::cout<<"c: " <<coeffs[2]<<std::endl;
+ 	*/
+ 	vector<float> coeffs = this->Ransac::getCoeffLSQ(test_det); 
+ 	std::cout<<"a: " <<coeffs[0]<<std::endl;
+ 	std::cout<<"b: " <<coeffs[1]<<std::endl;
+ 	std::cout<<"c: " <<coeffs[2]<<std::endl;
+ }
+
 
 // PRIVATE MEMBER METHODS.
 
-// DONE: Method which choses a random points from the data set.
+// DONE & TESTED: Method which choses a random points from the data set.
 Point2f Ransac::getRandomPoint()
 {
-	std::srand(std::time(0)); // use current time as seed for random generator
 	int random_index = std::rand() % this->data_set_.size();  
 	return this->data_set_[random_index];
 }
 
 
- // DONE: Method which takes exactly the required number of points fits the polynom (-->fully determined) and returns the coefficients.
+ // DONE & TESTED: Method which takes exactly the required number of points fits the polynom (-->fully determined) and returns the coefficients.
  // !!!Eigentlich könnte diese Funktion auch mit getCoeffLSQ gemacht werden!!!
  vector<float> Ransac::getCoeffDet(vector<Point2f> det_points)
  {
@@ -125,9 +145,7 @@ Point2f Ransac::getRandomPoint()
   	return coeff_copy;
  }
 
-
-
-// DONE: Method which returns the absolute distance from a given polynomial. 
+// DONE & TESTED: Method which returns the absolute distance from a given polynomial. 
 // !!! Effizienter wäre es für einen random set an Punkten das Polynom nur einmal zu diskretisieren.
 float Ransac::getDistancePointToPolynom(Point2f point, vector<float> polynom_coeff)
 {
@@ -152,7 +170,7 @@ float Ransac::getDistancePointToPolynom(Point2f point, vector<float> polynom_coe
 	return minimal_distance;
 }
 
- // Method, which takes more than the required number of points, fits the polynom using LSQ (-->over determined) and returns the parameters.
+ // DONE & TESTED: Method, which takes more than the required number of points, fits the polynom using LSQ (-->over determined) and returns the parameters.
  vector<float> Ransac::getCoeffLSQ(vector<Point2f> over_det_points)
  {
  	// Create matrix A.
