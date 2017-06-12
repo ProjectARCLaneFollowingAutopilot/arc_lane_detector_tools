@@ -157,15 +157,41 @@ float Ransac::getDistancePointToPolynom(Point2f point, vector<float> polynom_coe
  {
  	// Create matrix A.
  	Eigen::MatrixXf A(over_det_points.size(),3);
+ 	// Create matrix A'.
+ 	Eigen::MatrixXf A_trans(3,over_det_points.size());
+ 	// Create matrix L.
+ 	Eigen::MatrixXf L(3,3);
+ 	// Create matrix R.
+ 	Eigen::MatrixXf R(3,over_det_points.size());
  	// Create matrix b.
  	Eigen::VectorXf b(over_det_points.size());
  	// Fill Matrix A and Vector b.
  	for(int i = 0; i<over_det_points.size(); i++)
  	{
  		float x = over_det_points[i].x;
- 		float y = over_det_points[i].x;
+ 		float y = over_det_points[i].y;
  		// Assign.
+ 		A(i, 0) = pow(x,2);
+ 		A(i, 1) = x;
+ 		A(i, 2) = 1;
  		b[i] = y;
- 		
  	}
+
+ 	// Transpose A.
+ 	A_trans =  A.transpose();
+ 	// Calculate L.
+ 	L = A_trans*A;
+ 	// Calculate R.
+ 	R = A_trans*b;
+
+   	Eigen::Vector3f coeff = L.colPivHouseholderQr().solve(R);
+
+   	vector<float> coeff_copy;
+
+   	for(int j = 0; j < 3; j++)
+   	{
+   		coeff_copy.push_back(coeff[j]);
+   	}
+
+   	return coeff_copy;
  } 
