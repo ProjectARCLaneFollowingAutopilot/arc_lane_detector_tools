@@ -61,28 +61,28 @@ vector<float> Ransac::getRansacCoeff()
 		// Iterate through the whole data set and find the inliers and create a new Consensus variable to store.
 		for(int j = 0; j<this->data_set_.size(); j++)
 		{
-			float distance = Ransac::getDistancePointToPolynom(this->data_set_[j], temp_coeff);
+			float distance = Ransac::getDistancePointToPolynom(this->data_set_[j], consensus_set_temp.polynom_coeff);
 			if(distance < this->max_inlier_distance_)
 			{
-				consensus_set_temp.cons_set.pushback(this->data_set_[j]);
+				consensus_set_temp.cons_set.push_back(this->data_set_[j]);
 			}
 			consensus_set_temp.size_cons_set = consensus_set_temp.cons_set.size();
 		}
 		// Append the consensus set vector with the just found consensus set struct.
 		if(consensus_set_temp.size_cons_set > this->min_size_consensus_)
 		{
-			this->all_cons_sets_.pushback(consensus_set_temp);
+			this->all_cons_sets_.push_back(consensus_set_temp);
 		}
 	}
 
 	// Find the largest consensus set.
 	int size_of_largest_cons = 0;
-	for(int j = 0; i<this->all_cons_sets_.size();j++)
+	for(int j = 0; j<this->all_cons_sets_.size();j++)
 	{
-		if(this->all_cons_sets_.size_cons_set > size_of_largest_cons)
+		if(this->all_cons_sets_[j].size_cons_set > size_of_largest_cons)
 		{
 			this->largest_consensus_set_ = all_cons_sets_[j];
-			size_of_largest_cons = this->all_cons_sets_.size_cons_set;
+			size_of_largest_cons = this->all_cons_sets_[j].size_cons_set;
 		}
 	}
 
