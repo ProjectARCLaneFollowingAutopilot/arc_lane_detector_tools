@@ -98,22 +98,7 @@ vector<float> Ransac::getRansacCoeff()
  // ONLY FOR TESTING.
  void Ransac::testFunction()
  {
-	vector<Point2f> test_det;
- 	for(int i = 0; i<15; i++)
- 	{
- 		Point2f test_punkt = this->getRandomPoint();
- 		test_det.push_back(test_punkt);
- 	}
-	/*
- 	vector<float> coeffs = this->Ransac::getCoeffDet(test_det);
- 	std::cout<<"a: " <<coeffs[0]<<std::endl;
- 	std::cout<<"b: " <<coeffs[1]<<std::endl;
- 	std::cout<<"c: " <<coeffs[2]<<std::endl;
- 	*/
- 	vector<float> coeffs = this->Ransac::getCoeffLSQ(test_det); 
- 	std::cout<<"a: " <<coeffs[0]<<std::endl;
- 	std::cout<<"b: " <<coeffs[1]<<std::endl;
- 	std::cout<<"c: " <<coeffs[2]<<std::endl;
+
  }
 
 
