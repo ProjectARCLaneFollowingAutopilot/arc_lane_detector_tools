@@ -90,6 +90,8 @@ vector<float> Ransac::getRansacCoeff()
 		}
 	}
 
+	std::cout<<"Size of consensus set: "<<this->largest_consensus_set_.size_cons_set<<std::endl;
+
 	// Return the found coefficients.
 	return this->Ransac::getCoeffLSQ(this->largest_consensus_set_.cons_set); 
 }
@@ -123,11 +125,11 @@ Point2f Ransac::getRandomPoint()
  }
 
 // DONE & TESTED: Method which returns the absolute distance from a given polynomial. 
-// !!! Effizienter wäre es für einen random set an Punkten das Polynom nur einmal zu diskretisieren.
+// !!! Effizienter wäre es für einen random set an Punkten das Polynom nur einmal zu diskretisieren!!!
 float Ransac::getDistancePointToPolynom(Point2f point, vector<float> polynom_coeff)
 {
 	// Iterate discretely through the polynomial to find the nearest point to the curve.
-	float resolution = 0.1;
+	float resolution = 0.01;
 	float minimal_distance = 1000.0;
 	for(float x = this->x_min_dataset_; x < this->x_max_dataset_; x = x + resolution)
 	{
