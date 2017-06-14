@@ -121,8 +121,6 @@ Point2f Ransac::getRandomPoint()
   	Eigen::Vector4f b;
   	A << pow(det_points[0].x,3),pow(det_points[0].x, 2),det_points[0].x,1,  pow(det_points[1].x,3),pow(det_points[1].x, 2),det_points[1].x,1,  pow(det_points[2].x,3),pow(det_points[2].x, 2),det_points[2].x,1, pow(det_points[3].x,3),pow(det_points[3].x, 2),det_points[3].x,1;
   	b << det_points[0].y, det_points[1].y, det_points[2].y, det_points[3].y;
-  	std::cout << "Here is the matrix A:\n" << A << std::endl;
-	std::cout << "Here is the vector b:\n" << b << std::endl;
   	Eigen::Vector4f coeff = A.colPivHouseholderQr().solve(b);
   	vector<float> coeff_copy;
   	coeff_copy.push_back(coeff[0]);
