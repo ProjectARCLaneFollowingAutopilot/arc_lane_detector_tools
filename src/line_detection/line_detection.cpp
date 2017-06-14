@@ -29,12 +29,16 @@ void LineDetector::setParams(Point2f roi_left_top, Point2f roi_right_bottom, Vec
 	// Set the two lines to the default lines.
 }
 
-// Method which forces to detect lines, does filtering and saves important data-->master function.
+// Method which forces to detect lines in the cropped image, does filtering and saves important data-->master function.
 void LineDetector::doLineDetection()
 {
 	// Find lines in the cropped image and save them.
+	this->all_lines_cropped_ =  this->LineDetector::findAllLines(this->cropped_);
 	// Transform all found lines to original coordinates and save them.
 	// Filter the cropped lines out to only find two lines and save.
+	vector<Vec2f> two_lines_crop =  this->LineDetector::getTwoLinesCrop();
+	this->left_line_cropped_ = two_lines_crop[0];
+	this->right_line_cropped_ = two_lines_crop[1];
 	// Transform filtered lines and save them.
 }
 
@@ -102,11 +106,24 @@ vector<Vec2f> LineDetector::getTwoLinesCrop()
 }
   
 // PRIVATE MEMBER METHODS.
-// Method which finds all lines in an image, using a combination of different line finding methods.
+// DONE: Method which finds all lines in an image, using a combination of different line finding methods.
 vector<Vec2f> LineDetector::findAllLines(Mat &lines_to_find)
 {
-	// Do methods.
-	//  Return huge lines.
+	// Do several Hough transforms.
+  	vector<Vec2f> h_c = HoughClassic (lines_to_find);
+  	vector<Vec2f> g_p = GrayProperty(lines_to_find);
+  	vector<Vec2f> i_r = InRange(lines_to_find);
+  	vector<Vec2f> c_g = CompareGray (lines_to_find);
+  	
+  	// Append all vectors.
+  	vector<Vec2f> all_detected_lines;
+  	all_detected_lines.insert(all_detected_lines.end(), h_c.begin(), h_c.end());
+  	all_detected_lines.insert(all_detected_lines.end(), g_p.begin(), g_p.end());
+  	all_detected_lines.insert(all_detected_lines.end(), i_r.begin(), i_r.end());
+  	all_detected_lines.insert(all_detected_lines.end(), c_g.begin(), c_g.end());
+
+	//  Return all lines.
+	return all_detected_lines;
 }
 
 // Line finding methods:
@@ -295,15 +312,9 @@ Mat LineDetector::FindGray(Mat src_FG)
 	return blur;
 }
 // Method which transforms rho and theta from cropped image (ROI) to original image.
-Vec2f LineDetector::polarParamCrop2Orig(Vec2f polar_param_crop)
-{
-
-}
+//Vec2f LineDetector::polarParamCrop2Orig(Vec2f polar_param_crop){}
 // Method which transforms rho and theta from original image to cropped image (ROI).
-Vec2f LineDetector::polarParamOrig2Crop(Vec2f polar_param_orig)
-{
-
-}
+//Vec2f LineDetector::polarParamOrig2Crop(Vec2f polar_param_orig){}
 
 // DONE: Method which transforms a point coordinate from original to cropped image.
 Point2f LineDetector::coordinateOrig2Crop(Point2f coord_orig)
@@ -317,7 +328,6 @@ Point2f LineDetector::coordinateCrop2Orig(Point2f coord_crop)
 	Point2f coord_orig(coord_crop.x + this->cropping_corners_[0].x, coord_crop.y + this->cropping_corners_[0].y);
 	return coord_orig;
 }
-
 
 // Draws lines to an image (both have to have the same coordinate system!) by getting a vector with (rho, theta).
 void LineDetector::drawLines2Image(Mat &draw_to, vector<Vec2f> lines_to_draw)

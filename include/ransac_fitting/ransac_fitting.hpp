@@ -8,6 +8,7 @@ Output shall be: Parameters of the fitted function.
 #include <cstdlib>
 #include <ctime>
 #include <cv.h>
+#include <fstream>
 #include <iostream>
 #include <Eigen/Dense>
 #include <vector>
@@ -22,7 +23,7 @@ struct Consensus
 {
   // Random points, used for calculating this consensus set.
   vector<Point2f> random_points; 
-  // Coefficients (a, b, c, d) of the polynom passing through the three random points.
+  // Coefficients (a, b, c, d) of the polynom passing through the four random points.
   vector<float> polynom_coeff;
   // Consensus set.
   vector<Point2f> cons_set;
@@ -59,7 +60,10 @@ class Ransac
   float getDistancePointToPolynom(Point2f point, vector<float> polynom_coeff);
   // DONE & TESTED: Method, which takes more than the required number of points, fits the polynom using LSQ (-->over determined) and returns the parameters.
   vector<float> getCoeffLSQ(vector<Point2f> over_det_points); 
-  
+  // Write the used consensus set to a text file.
+  void writeLargestConsSetToFile();
+
+
   // PRIVATE MEMBER VARIABLES.
   // The maximum allowed distance (define distance!) from the curve, such that point counted as inlier.
   float max_inlier_distance_; 

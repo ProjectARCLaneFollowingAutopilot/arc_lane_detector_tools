@@ -48,7 +48,7 @@ class LineDetector
 
   private:
   // PRIVATE MEMBER METHODS.
-  // Method which finds all lines in an image, using a combination of different line finding methods.
+  // DONE: Method which finds all lines in an image, using a combination of different line finding methods.
   vector<Vec2f> findAllLines(Mat &lines_to_find);
   // Line finding methods:
   // DONE: ???
@@ -70,14 +70,14 @@ class LineDetector
   // DONE: ???
   Mat FindGray(Mat src_FG);
   // Method which transforms rho and theta from cropped image (ROI) to original image.
-  Vec2f polarParamCrop2Orig(Vec2f polar_param_crop);
+  //Vec2f polarParamCrop2Orig(Vec2f polar_param_crop);
   // Method which transforms rho and theta from original image to cropped image (ROI).
-  Vec2f polarParamOrig2Crop(Vec2f polar_param_orig);
-  // Method which transforms a point coordinate from original to cropped image.
+  //Vec2f polarParamOrig2Crop(Vec2f polar_param_orig);
+  // DONE: Method which transforms a point coordinate from original to cropped image.
   Point2f coordinateOrig2Crop(Point2f coord_orig);
   // Method which transforms a point coordinate from cropped to original image.
   Point2f coordinateCrop2Orig(Point2f coord_crop);
-  // Draws lines to an image (both have to have the same coordinate system!) by getting a vector with (rho, theta).
+  // DONE: Draws lines to an image (both have to have the same coordinate system!) by getting a vector with (rho, theta).
   void drawLines2Image(Mat &draw_to, vector<Vec2f> lines_to_draw);
   // DONE: Displays the image in a window.
   void showImage(Mat show, string name);

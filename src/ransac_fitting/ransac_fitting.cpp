@@ -72,6 +72,7 @@ vector<float> Ransac::getRansacCoeff()
 			}
 			consensus_set_temp.size_cons_set = consensus_set_temp.cons_set.size();
 		}
+		std::cout<<"Temp cons set size: "<<consensus_set_temp.size_cons_set<<std::endl;
 		// Append the consensus set vector with the just found consensus set struct.
 		if(consensus_set_temp.size_cons_set > this->min_size_consensus_)
 		{
@@ -91,7 +92,8 @@ vector<float> Ransac::getRansacCoeff()
 	}
 
 	std::cout<<"Size of consensus set: "<<this->largest_consensus_set_.size_cons_set<<std::endl;
-
+	// Write the used consensus set to a text file.
+	this->Ransac::writeLargestConsSetToFile();
 	// Return the found coefficients.
 	return this->Ransac::getCoeffLSQ(this->largest_consensus_set_.cons_set); 
 }
@@ -101,7 +103,6 @@ void Ransac::clearUp()
 	this->data_set_.clear();
 	this->all_cons_sets_.clear();
 }
-
 
 // PRIVATE MEMBER METHODS.
 
@@ -136,9 +137,10 @@ Point2f Ransac::getRandomPoint()
 float Ransac::getDistancePointToPolynom(Point2f point, vector<float> polynom_coeff)
 {
 	// Iterate discretely through the polynomial to find the nearest point to the curve.
-	float resolution = 0.01;
+	float resolution = 1.0;
 	float minimal_distance = 1000.0;
-	for(float x = this->x_min_dataset_; x < this->x_max_dataset_; x = x + resolution)
+	//for(float x = this->x_min_dataset_; x < this->x_max_dataset_; x = x + resolution)
+	for(float x = -350; x < 350; x = x + resolution)
 	{
 		// Evaluate polynomial at a discrete point --> y(x).
 		float y = polynom_coeff[0]*pow(x,3) + polynom_coeff[1]*pow(x,2) + polynom_coeff[2]*x + polynom_coeff[3];
@@ -182,6 +184,7 @@ float Ransac::getDistancePointToPolynom(Point2f point, vector<float> polynom_coe
  		b[i] = y;
  	}
 
+ 	/*
  	// Transpose A.
  	A_trans =  A.transpose();
  	// Calculate L.
@@ -190,7 +193,8 @@ float Ransac::getDistancePointToPolynom(Point2f point, vector<float> polynom_coe
  	R = A_trans*b;
 
    	Eigen::Vector4f coeff = L.colPivHouseholderQr().solve(R);
-
+	*/
+	Eigen::Vector4f coeff = A.jacobiSvd(Eigen::ComputeThinU|Eigen::ComputeThinV).solve(b);
    	vector<float> coeff_copy;
 
    	for(int j = 0; j < 4; j++)
@@ -199,4 +203,26 @@ float Ransac::getDistancePointToPolynom(Point2f point, vector<float> polynom_coe
    	}
 
    	return coeff_copy;
- } 
+ }
+
+// Write the used consensus set to a text file.
+void Ransac::writeLargestConsSetToFile()
+{
+	std::ofstream write_out;
+	write_out.open("/home/nikhilesh/DataTextFiles/used_consensus_set.txt");
+
+	for(int i = 0; i < this->largest_consensus_set_.size_cons_set; i++)
+	{
+		write_out <<this->largest_consensus_set_.cons_set[i].x<<" "<<this->largest_consensus_set_.cons_set[i].y<<"\n";
+	}
+  	write_out.close();
+
+  	std::ofstream random_sample_last;
+  	random_sample_last.open("/home/nikhilesh/DataTextFiles/used_randoms_set.txt");
+	for(int i = 0; i < this->largest_consensus_set_.polynom_coeff.size(); i++)
+	{
+		random_sample_last <<this->largest_consensus_set_.polynom_coeff[i]<<"\n";
+	}
+  	random_sample_last.close();
+}
+
