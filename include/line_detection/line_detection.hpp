@@ -19,24 +19,37 @@ class LineDetector
   LineDetector();
   // DONE: Standard destructor.
   ~LineDetector();
-  // DONE: Set a new original image.
+  // DONE: Set a new original and cropped image.
   void setImage(Mat &new_image);
   // DONE: Define all parameters: ROI-Cropping corners, two default lines (original coordinates),...
   void setParams(Point2f roi_left_top, Point2f roi_right_bottom, Vec2f default_left, Vec2f default_right);
-  // DONE: Does the Hough-Transform and draws the lines.
-  void houghTransform(Mat &contours, Mat &draw_to, vector<Vec2f> &lines_hT, int threshold);
-  // Function which returns ALL lines in the original coordinate system.
-  vector<Vec2f> getAllLinesOrig();
-  // Function which returns ALL lines in the cropped coordinate system.
-  vector<Vec2f> getAllLinesCrop();
+  // Method which forces to detect lines, does filtering and saves important data-->master function.
+  void doLineDetection();
+  // Method which returns the left pointcloud around the two lines in the original coordinate system.
+  vector<Point2f> pointsAroundLeftLineOrig();
+  // Method which returns the right pointcloud around the two lines in the original coordinate system.
+  vector<Point2f> pointsAroundRightLineOrig();
   // DONE: Method which deletes the lines vectors.
   void clearLines();
+
+  // Helper methods:
+  // DONE: Does the Hough-Transform and draws the lines.
+  void houghTransform(Mat &contours, Mat &draw_to, vector<Vec2f> &lines_hT, int threshold);
+  // Method which returns ALL lines in the original coordinate system.
+  vector<Vec2f> getAllLinesOrig();
+  // Method which returns ALL lines in the cropped coordinate system.
+  vector<Vec2f> getAllLinesCrop();
+  // Method which returns only two lines in the original coordinate system.
+  vector<Vec2f> getTwoLinesOrig();
+  // Method which returns only two lines in the cropped coordinate system.
+  vector<Vec2f> getTwoLinesCrop();
   
   // PUBLIC MEMBER VARIABLES.
 
-
   private:
   // PRIVATE MEMBER METHODS.
+  // Method which finds all lines in an image, using a combination of different line finding methods.
+  vector<Vec2f> findAllLines(Mat &lines_to_find);
   // Line finding methods:
   // DONE: ???
   vector<Vec2f> HoughClassic (Mat &src_HC);
@@ -64,10 +77,11 @@ class LineDetector
   Point2f coordinateOrig2Crop(Point2f coord_orig);
   // Method which transforms a point coordinate from cropped to original image.
   Point2f coordinateCrop2Orig(Point2f coord_crop);
-  // Function which does all kind of line detections for a given image and returns the lines.
-  vector<Vec2f> getAllLines(Mat &color_image);
   // Draws lines to an image (both have to have the same coordinate system!) by getting a vector with (rho, theta).
   void drawLines2Image(Mat &draw_to, vector<Vec2f> lines_to_draw);
+  // DONE: Displays the image in a window.
+  void showImage(Mat show, string name);
+
 
   // PRIVATE MEMBER VARIABLES.
   // Store parameters of two default lines left/right (original coordinates) --> Needed for resetting.
@@ -83,5 +97,12 @@ class LineDetector
   vector<Vec2f> all_lines_orig_;
   // Store all of the detected lines in the cropped coordinate system.
   vector<Vec2f> all_lines_cropped_;
-
+  // Store the left line in the original coordinate system.
+  Vec2f left_line_orig_;
+  // Store the right line in the original coordinate system.
+  Vec2f right_line_orig_;
+  // Store the left line in the cropped coordinate system.
+  Vec2f left_line_cropped_;
+  // Store the right line in the cropped coordinate system.
+  Vec2f right_line_cropped_;
 };

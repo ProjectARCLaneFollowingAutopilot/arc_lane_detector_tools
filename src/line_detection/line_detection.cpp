@@ -11,10 +11,13 @@ LineDetector::~LineDetector()
 {
 	std::cout<<"Linedetector destroyed!"<<std::endl;
 }
-// DONE: Set a new original image.
+// DONE: Set a new original and cropped image.
 void LineDetector::setImage(Mat &new_image)
 {
+	// Set original image.
 	this->original_ = new_image.clone();
+	// Set cropped image.
+	this->cropped_ = new_image(Rect(this->cropping_corners_[0].x, this->cropping_corners_[0].y, this->cropping_corners_[1].x - this->cropping_corners_[0].x, this->cropping_corners_[1].y - this->cropping_corners_[0].y));
 }
 // DONE: Define all parameters: ROI-Cropping corners, two default lines (original coordinates),...
 void LineDetector::setParams(Point2f roi_left_top, Point2f roi_right_bottom, Vec2f default_left, Vec2f default_right)
@@ -23,7 +26,36 @@ void LineDetector::setParams(Point2f roi_left_top, Point2f roi_right_bottom, Vec
 	this->cropping_corners_[1] = roi_right_bottom;
 	this->default_lines_[0] = default_left;
 	this->default_lines_[1] = default_right;
+	// Set the two lines to the default lines.
 }
+
+// Method which forces to detect lines, does filtering and saves important data-->master function.
+void LineDetector::doLineDetection()
+{
+	// Find lines in the cropped image and save them.
+	// Transform all found lines to original coordinates and save them.
+	// Filter the cropped lines out to only find two lines and save.
+	// Transform filtered lines and save them.
+}
+
+// Method which returns the left pointcloud around the two lines in the original coordinate system.
+vector<Point2f> LineDetector::pointsAroundLeftLineOrig()
+{
+
+}
+// Method which returns the right pointcloud around the two lines in the original coordinate system.
+vector<Point2f> LineDetector::pointsAroundRightLineOrig()
+{
+
+}
+// DONE: Method which deletes the lines vectors.
+void LineDetector::clearLines()
+{
+  this->all_lines_orig_.clear();
+  this->all_lines_cropped_.clear();
+}
+
+// Helper methods:
 // DONE: Does the Hough-Transform, gives lines and draws the lines.
 void LineDetector::houghTransform(Mat &contours, Mat &draw_to, vector<Vec2f> &lines_hT, int threshold)
 {
@@ -48,24 +80,35 @@ void LineDetector::houghTransform(Mat &contours, Mat &draw_to, vector<Vec2f> &li
 		line(draw_to, pt1, pt2, Scalar(0, 255, 0), 3, CV_AA);
 	}
 }
-// Function which returns ALL lines in the original coordinate system.
+// Method which returns ALL lines in the original coordinate system.
 vector<Vec2f> LineDetector::getAllLinesOrig()
 {
 
 }
-// Function which returns ALL lines in the cropped coordinate system.
+// Method which returns ALL lines in the cropped coordinate system.
 vector<Vec2f> LineDetector::getAllLinesCrop()
 {
 
 }
-// DONE: Method which deletes the lines vectors.
-void LineDetector::clearLines()
+// Method which returns only two lines in the original coordinate system.
+vector<Vec2f> LineDetector::getTwoLinesOrig()
 {
-  this->all_lines_orig_.clear();
-  this->all_lines_cropped_.clear();
+
+}
+// Method which returns only two lines in the cropped coordinate system.
+vector<Vec2f> LineDetector::getTwoLinesCrop()
+{
+
 }
   
 // PRIVATE MEMBER METHODS.
+// Method which finds all lines in an image, using a combination of different line finding methods.
+vector<Vec2f> LineDetector::findAllLines(Mat &lines_to_find)
+{
+	// Do methods.
+	//  Return huge lines.
+}
+
 // Line finding methods:
 // DONE: ???
 vector<Vec2f> LineDetector::HoughClassic(Mat &src_HC)
@@ -275,13 +318,16 @@ Point2f LineDetector::coordinateCrop2Orig(Point2f coord_crop)
 	return coord_orig;
 }
 
-// Function which does all kind of line detections for a given image and returns the lines.
-vector<Vec2f> LineDetector::getAllLines(Mat &color_image)
-{
 
-}
 // Draws lines to an image (both have to have the same coordinate system!) by getting a vector with (rho, theta).
 void LineDetector::drawLines2Image(Mat &draw_to, vector<Vec2f> lines_to_draw)
 {
 
+}
+ // DONE: Displays the image in a window.
+void LineDetector::showImage(Mat show, string name)
+{
+	namedWindow(name, CV_WINDOW_AUTOSIZE);
+	imshow(name, show);
+  	waitKey(1);
 }
