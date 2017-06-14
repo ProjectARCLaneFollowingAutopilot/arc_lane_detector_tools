@@ -32,6 +32,8 @@ class IPM
   cv::Mat invPerspectiveMapping();
   // Method to prompt the user to set input control points.
   void setCtrlPts();
+  // Method which transforms a single point and returns the coordinates in the vehicle frame.
+  cv::Point2f image2Local(cv::Point2f image_coordinate);
 
   // PUBLIC MEMBER VARIABLES.
 

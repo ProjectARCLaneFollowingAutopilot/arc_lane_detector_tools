@@ -94,6 +94,30 @@ cv::Mat IPM::invPerspectiveMapping()
   return this->output_img_;
 }
 
+// Method which transforms a single point and returns the coordinates in the vehicle frame.
+cv::Point2f IPM::image2Local(cv::Point2f image_coordinate)
+{
+  // Variable which stores the actual cartesian coordinates of the input points' projection on the ground plane. In world coordinates!
+  cv::Point2f ground_point_cartesian;
+  float x_ground;
+  float y_ground;
+  float alpha_rad = ((this->pitch_angle_deg_)/180.0)*PI;
+  // Project the pixel point, onto the ground plane (in the vehicle frame).
+
+  // Get pixel coordinates centred at the image centre and convention as used when deriving the formulas (u to the right, v to the top).
+  float u = (image_coordinate.x - (this->input_width_px_)/2.0);
+  float v =  (-1.0)*(image_coordinate.y - (this->input_height_px_)/2.0);
+
+  // Find lambda from equation (7).
+  float lambda = (this->camera_height_m_)/((this->focal_length_px_)*cos(alpha_rad) -  v*sin(alpha_rad));
+  // Project pixel from src_points_ to x,y (in world frame) onto ground plane (z = 0) using equation (6) and save to dst_points_cartesian.
+  x_ground = 0.0 + lambda*(v*cos(alpha_rad) + (this->focal_length_px_)*sin(alpha_rad));
+  y_ground = 0.0 - lambda*u;
+  ground_point_cartesian.x = x_ground;
+  ground_point_cartesian.y = y_ground;
+}
+
+
 // PRIVATE MEMBER METHODS.
 // Method which prompts the user to calibrate the transformation matrix by assigning four pixel each in an image.
 void IPM::setTransformationMatrix()
