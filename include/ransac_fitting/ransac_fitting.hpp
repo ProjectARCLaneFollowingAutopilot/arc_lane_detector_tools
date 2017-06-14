@@ -4,7 +4,6 @@ Use this class to fit a 2nd order polynomial to a set of points.
 Input shall be: Set of points, number of iterations, thresholds.
 Output shall be: Parameters of the fitted function.
 */
-
 #include <cmath>
 #include <cstdlib>
 #include <ctime>
@@ -23,7 +22,7 @@ struct Consensus
 {
   // Random points, used for calculating this consensus set.
   vector<Point2f> random_points; 
-  // Coefficients (a, b, c) of the polynom passing through the three random points.
+  // Coefficients (a, b, c, d) of the polynom passing through the three random points.
   vector<float> polynom_coeff;
   // Consensus set.
   vector<Point2f> cons_set;
@@ -45,6 +44,8 @@ class Ransac
   void setRansacParams(float max_inlier_distance, int max_num_of_iterations, int min_size_consensus);
   // DONE: Method which does the RANSAC algorithm and returns the found polynomial parameters -->Master function.
   vector<float> getRansacCoeff();
+  // Method to clear up for the next fitting.
+  void clearUp();
 
   // PUBLIC MEMBER VARIABLES.
 
@@ -58,6 +59,7 @@ class Ransac
   float getDistancePointToPolynom(Point2f point, vector<float> polynom_coeff);
   // DONE & TESTED: Method, which takes more than the required number of points, fits the polynom using LSQ (-->over determined) and returns the parameters.
   vector<float> getCoeffLSQ(vector<Point2f> over_det_points); 
+  
   // PRIVATE MEMBER VARIABLES.
   // The maximum allowed distance (define distance!) from the curve, such that point counted as inlier.
   float max_inlier_distance_; 

@@ -53,8 +53,8 @@ vector<float> Ransac::getRansacCoeff()
 		// Create a Consensus struct to store the data of the current iteration.
 		Consensus consensus_set_temp;
 
-		// Do a random sample to find three points from the data set. 
-		for(int k = 0; k<3; k++)
+		// Do a random sample to find four points from the data set. 
+		for(int k = 0; k<4; k++)
 		{
 			Point2f random_point = this->Ransac::getRandomPoint();
 			consensus_set_temp.random_points.push_back(random_point);
@@ -96,6 +96,13 @@ vector<float> Ransac::getRansacCoeff()
 	return this->Ransac::getCoeffLSQ(this->largest_consensus_set_.cons_set); 
 }
 
+void Ransac::clearUp()
+{
+	this->data_set_.clear();
+	this->all_cons_sets_.clear();
+}
+
+
 // PRIVATE MEMBER METHODS.
 
 // DONE & TESTED: Method which choses a random points from the data set.
@@ -105,21 +112,21 @@ Point2f Ransac::getRandomPoint()
 	return this->data_set_[random_index];
 }
 
-
  // DONE & TESTED: Method which takes exactly the required number of points fits the polynom (-->fully determined) and returns the coefficients.
  // !!!Eigentlich könnte diese Funktion auch mit getCoeffLSQ gemacht werden!!!
  vector<float> Ransac::getCoeffDet(vector<Point2f> det_points)
  {
- 	Eigen::Matrix3f A;
-  	Eigen::Vector3f b;
-  	A << pow(det_points[0].x,2),det_points[0].x,1,  pow(det_points[1].x,2),det_points[1].x,1,  pow(det_points[2].x,2),det_points[2].x,1;
-  	b << det_points[0].y, det_points[1].y, det_points[2].y;
+ 	Eigen::Matrix4f A;
+  	Eigen::Vector4f b;
+  	A << pow(det_points[0].x,3),pow(det_points[0].x, 2),det_points[0].x,1,  pow(det_points[1].x,3),pow(det_points[1].x, 2),det_points[1].x,1,  pow(det_points[2].x,3),pow(det_points[2].x, 2),det_points[2].x,1, pow(det_points[3].x,3),pow(det_points[3].x, 2),det_points[3].x,1;
+  	b << det_points[0].y, det_points[1].y, det_points[2].y, det_points[3].y;
   	std::cout << "Here is the matrix A:\n" << A << std::endl;
 	std::cout << "Here is the vector b:\n" << b << std::endl;
-  	Eigen::Vector3f coeff = A.colPivHouseholderQr().solve(b);
+  	Eigen::Vector4f coeff = A.colPivHouseholderQr().solve(b);
   	vector<float> coeff_copy;
   	coeff_copy.push_back(coeff[0]);
   	coeff_copy.push_back(coeff[1]);
+  	coeff_copy.push_back(coeff[2]);
   	coeff_copy.push_back(coeff[2]);
   	return coeff_copy;
  }
@@ -134,7 +141,7 @@ float Ransac::getDistancePointToPolynom(Point2f point, vector<float> polynom_coe
 	for(float x = this->x_min_dataset_; x < this->x_max_dataset_; x = x + resolution)
 	{
 		// Evaluate polynomial at a discrete point --> y(x).
-		float y = polynom_coeff[0]*pow(x,2) + polynom_coeff[1]*x + polynom_coeff[2];
+		float y = polynom_coeff[0]*pow(x,3) + polynom_coeff[1]*pow(x,2) + polynom_coeff[2]*x + polynom_coeff[3];
 		// Save point on polynomial.
 		Point2f temp_coord(x, y);
 		// Calculate absolute distance to given point.
@@ -153,13 +160,13 @@ float Ransac::getDistancePointToPolynom(Point2f point, vector<float> polynom_coe
  vector<float> Ransac::getCoeffLSQ(vector<Point2f> over_det_points)
  {
  	// Create matrix A.
- 	Eigen::MatrixXf A(over_det_points.size(),3);
+ 	Eigen::MatrixXf A(over_det_points.size(),4);
  	// Create matrix A'.
- 	Eigen::MatrixXf A_trans(3,over_det_points.size());
+ 	Eigen::MatrixXf A_trans(4,over_det_points.size());
  	// Create matrix L.
- 	Eigen::MatrixXf L(3,3);
+ 	Eigen::MatrixXf L(4,4);
  	// Create matrix R.
- 	Eigen::MatrixXf R(3,over_det_points.size());
+ 	Eigen::MatrixXf R(4,1);
  	// Create matrix b.
  	Eigen::VectorXf b(over_det_points.size());
  	// Fill Matrix A and Vector b.
@@ -168,9 +175,10 @@ float Ransac::getDistancePointToPolynom(Point2f point, vector<float> polynom_coe
  		float x = over_det_points[i].x;
  		float y = over_det_points[i].y;
  		// Assign.
- 		A(i, 0) = pow(x,2);
- 		A(i, 1) = x;
- 		A(i, 2) = 1;
+ 		A(i, 0) = pow(x,3);
+ 		A(i, 1) = pow(x,2);
+ 		A(i, 2) = x;
+ 		A(i, 3) = 1;
  		b[i] = y;
  	}
 
@@ -181,11 +189,11 @@ float Ransac::getDistancePointToPolynom(Point2f point, vector<float> polynom_coe
  	// Calculate R.
  	R = A_trans*b;
 
-   	Eigen::Vector3f coeff = L.colPivHouseholderQr().solve(R);
+   	Eigen::Vector4f coeff = L.colPivHouseholderQr().solve(R);
 
    	vector<float> coeff_copy;
 
-   	for(int j = 0; j < 3; j++)
+   	for(int j = 0; j < 4; j++)
    	{
    		coeff_copy.push_back(coeff[j]);
    	}
