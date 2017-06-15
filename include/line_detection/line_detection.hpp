@@ -21,16 +21,16 @@ class LineDetector
   ~LineDetector();
   // DONE: Set a new original and cropped image.
   void setImage(Mat &new_image);
-  // DONE: Define all parameters: ROI-Cropping corners, two default lines (original coordinates),...
+  // DONE: Define all parameters: ROI-Cropping corners, two default lines (cropped coordinates),...
   void setParams(Point2f roi_left_top, Point2f roi_right_bottom, Vec2f default_left, Vec2f default_right);
-  // Method which forces to detect lines, does filtering and saves important data-->master function.
+  // DONE: Method which forces to detect lines, does filtering and saves important data-->master function.
   void doLineDetection();
   // Method which returns the left pointcloud around the two lines in the original coordinate system.
   vector<Point2f> pointsAroundLeftLineOrig();
   // Method which returns the right pointcloud around the two lines in the original coordinate system.
   vector<Point2f> pointsAroundRightLineOrig();
-  // DONE: Method which deletes the lines vectors.
-  void clearLines();
+  // DONE: Method which clears variables for a next image.
+  void clearUp();
 
   // Helper methods:
   // DONE: Does the Hough-Transform and draws the lines.
@@ -84,15 +84,21 @@ class LineDetector
 
 
   // PRIVATE MEMBER VARIABLES.
-  // Store parameters of two default lines left/right (original coordinates) --> Needed for resetting.
-  vector<Vec2f> default_lines_;
+  // Store parameters of two default lines left (cropped coordinates) --> Needed for resetting.
+  vector<Vec2f> default_left_;
+  // Store parameters of two default lines right (cropped coordinates) --> Needed for resetting.
+  vector<Vec2f> default_right_;
   // Store coordinates of cropped image (top left and bottom right corner) in original coordinates.
   vector<Point2f> cropping_corners_;
   // Store original color image.
   cv::Mat original_; 
   // Store cropped color image (from original).
   cv::Mat cropped_;
-
+  // Keep track for how many times, no left line update was performed --> Decide then if RESET needed.
+  int update_counter_left_;
+  // Keep track for how many times, no left right update was performed --> Decide then if RESET needed.
+  int update_counter_right_;
+  
   // Store all of the detected lines in the original coordinate system.
   vector<Vec2f> all_lines_orig_;
   // Store all of the detected lines in the cropped coordinate system.

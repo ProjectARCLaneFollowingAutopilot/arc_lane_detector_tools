@@ -4,6 +4,8 @@
 // DONE: Standard constructor.
 LineDetector::LineDetector()
 {
+	this->update_counter_left_ = 0;
+	this->update_counter_right_ = 0;
 	std::cout<<"Linedetector created!"<<std::endl;
 }
 // DONE: Standard destructor.
@@ -14,22 +16,24 @@ LineDetector::~LineDetector()
 // DONE: Set a new original and cropped image.
 void LineDetector::setImage(Mat &new_image)
 {
+	// Reset all data from previous iteration.
+	this->LineDetector::clearUp();
 	// Set original image.
 	this->original_ = new_image.clone();
 	// Set cropped image.
 	this->cropped_ = new_image(Rect(this->cropping_corners_[0].x, this->cropping_corners_[0].y, this->cropping_corners_[1].x - this->cropping_corners_[0].x, this->cropping_corners_[1].y - this->cropping_corners_[0].y));
 }
-// DONE: Define all parameters: ROI-Cropping corners, two default lines (original coordinates),...
+// DONE: Define all parameters: ROI-Cropping corners, two default lines (cropped coordinates),...
 void LineDetector::setParams(Point2f roi_left_top, Point2f roi_right_bottom, Vec2f default_left, Vec2f default_right)
 {
 	this->cropping_corners_[0] = roi_left_top;
 	this->cropping_corners_[1] = roi_right_bottom;
-	this->default_lines_[0] = default_left;
-	this->default_lines_[1] = default_right;
+	this->default_left_ = default_left;
+	this->default_right_ = default_right;
 	// Set the two lines to the default lines.
 }
 
-// Method which forces to detect lines in the cropped image, does filtering and saves important data-->master function.
+// DONE: Method which forces to detect lines in the cropped image, does filtering and saves important data-->master function.
 void LineDetector::doLineDetection()
 {
 	// Find lines in the cropped image and save them.
@@ -52,11 +56,13 @@ vector<Point2f> LineDetector::pointsAroundRightLineOrig()
 {
 
 }
-// DONE: Method which deletes the lines vectors.
-void LineDetector::clearLines()
+// DONE: Method which clears variables for a next image.
+void LineDetector::clearUp()
 {
-  this->all_lines_orig_.clear();
-  this->all_lines_cropped_.clear();
+  	this->all_lines_orig_.clear();
+  	this->all_lines_cropped_.clear();
+  	this->update_counter_left_ = 0;
+  	this->update_counter_right_ = 0;
 }
 
 // Helper methods:
@@ -84,25 +90,144 @@ void LineDetector::houghTransform(Mat &contours, Mat &draw_to, vector<Vec2f> &li
 		line(draw_to, pt1, pt2, Scalar(0, 255, 0), 3, CV_AA);
 	}
 }
+
 // Method which returns ALL lines in the original coordinate system.
-vector<Vec2f> LineDetector::getAllLinesOrig()
-{
-
-}
+//vector<Vec2f> LineDetector::getAllLinesOrig(){}
 // Method which returns ALL lines in the cropped coordinate system.
-vector<Vec2f> LineDetector::getAllLinesCrop()
-{
-
-}
+//vector<Vec2f> LineDetector::getAllLinesCrop(){}
 // Method which returns only two lines in the original coordinate system.
-vector<Vec2f> LineDetector::getTwoLinesOrig()
-{
+//vector<Vec2f> LineDetector::getTwoLinesOrig(){}
 
-}
-// Method which returns only two lines in the cropped coordinate system.
+// NOT FINISHED: Method which returns only two lines in the cropped coordinate system.
 vector<Vec2f> LineDetector::getTwoLinesCrop()
 {
+	bool update_left = false;
+  	bool update_right = false;
 
+  	vector<Vec2f> lines_left;
+  	vector<Vec2f> lines_right;
+
+  	// Set the constraints needed to filter. These constraints shall reset them to default values after five loops without two lines.
+  	// Idea: Three cases. Find the most suitable reset parameters: Left curved, right curved, straight.
+  	if((this->update_counter_left_ > 5) && (this->update_counter_right_ < 5))
+  	{
+    	this->left_line_cropped_[1] = this->default_left_[1];
+    	this->left_line_cropped_[0] = this->default_left_[0];
+   		this->update_counter_left_ = 0;
+  	}
+  	else if((this->update_counter_left_ < 5) && (this->update_counter_right_ > 5))
+  	{
+		this->right_line_cropped_[1] = this->default_right_[1];
+    	this->right_line_cropped_[0] = this->default_right_[0];
+   		this->update_counter_right_ = 0;
+  	}
+  	else if((this->update_counter_left_ > 5) && (this->update_counter_right_ > 5))
+  	{
+        this->left_line_cropped_[1] = this->default_left_[1];
+    	this->left_line_cropped_[0] = this->default_left_[0];
+    	this->right_line_cropped_[1] = this->default_right_[1];
+    	this->right_line_cropped_[0] = this->default_right_[0];
+    	this->update_counter_left_ = 0;
+    	this->update_counter_right_ = 0;
+  	}
+
+  	vector<Vec2f> lines = this->all_lines_cropped_;
+  	if(lines.size() > 0)
+  	{
+    	// Assign all lines to lines_left and lines_right. In the same step also filter out all obvious bad matches (to big jumps).
+    	for(int i = 0; i < lines.size(); i++)
+    	{
+      		float top_crossing_x = lines[i][0]*cos(lines[i][1]) - sin(lines[i][1])*((0 - lines[i][0]*sin(lines[i][1]))/(cos(lines[i][1])));
+      		float bottom_crossing_x = lines[i][0]*cos(lines[i][1]) - sin(lines[i][1])*((this->cropped_.rows - lines[i][0]*sin(lines[i][1]))/(cos(lines[i][1])));
+      		if((bottom_crossing_x < this->cropped_.cols/2.0) && (bottom_crossing_x > - 320.0))
+      		{
+        		float rel_error_theta_left = std::abs(1.0 - lines[i][1]/this->left_line_cropped_[1]);
+        		if(lines[i][1] < 1.3)
+        		{
+        			lines_left.push_back(lines[i]);
+        		}
+      		}
+      	if((bottom_crossing_x > this->cropped_.cols/2.0) && (bottom_crossing_x < 960))
+      	{
+        	float rel_error_theta_right = std::abs(1.0 - lines[i][1]/this->right_line_cropped_[1]);
+        	if(rel_error_theta_right < 0.5)
+        	{
+          		lines_right.push_back(lines[i]);
+        	}
+      	}
+    }
+
+    std::cout<<"Number of left lines: "<<lines_left.size()<<std::endl;
+    std::cout<<"Number of right lines: "<<lines_right.size()<<std::endl;
+
+    // After having excluded the obvious mismatches, assign the best matches for the next frame -->Update Step.
+    if(lines_left.size() > 0)
+    {
+    	float cost_left = 100.0;
+      	int index_minimal_cost_left = 0;
+      	for(int i = 0; i < lines_left.size(); i++)
+      	{
+       		// For each line calculate the relative error in rho.
+       		float rel_error_rho_left_loop = (lines_left[i][0] - this->left_line_cropped_[0])/this->left_line_cropped_[0];
+       		// For each line calculate the relative error in theta.
+       		float rel_error_theta_left_loop = (lines_left[i][1] - this->left_line_cropped_[1])/this->left_line_cropped_[1];
+       		// For each line calculate a cost function.
+       		float cost_left_loop = sqrt(pow(rel_error_rho_left_loop, 2) + pow(rel_error_theta_left_loop, 2));
+       		// If the cost is lower than the previous, save the line as the correct one.
+       		if(cost_left_loop < cost_left)
+       		{
+         		index_minimal_cost_left = i;
+         		cost_left = cost_left_loop;
+       		}
+      	}
+      	// Update left.
+      	this->left_line_cropped_[0] = lines_left[index_minimal_cost_left][0];
+      	this->left_line_cropped_[1] = lines_left[index_minimal_cost_left][1];
+      	this->update_counter_left_ = 0;
+    }
+    else
+    {
+     	// No update for left line.
+      	this->update_counter_left += 1;
+    }
+
+    if(lines_right.size() > 0)
+    {
+    	float cost_right = 100.0;
+      	int index_minimal_cost_right = 0;
+      	for(int i = 0; i < lines_right.size(); i++)
+     	{
+       		// For each line calculate the relative error in rho.
+       		float rel_error_rho_right_loop = (lines_right[i][0] - this->right_line_cropped_[0])/this->right_line_cropped_[0];
+       		// For each line calculate the relative error in theta.
+       		float rel_error_theta_right_loop = (lines_right[i][1] - this->right_line_cropped_[1])/this->right_line_cropped_[1];
+       		// For each line calculate a cost function.
+       		float cost_right_loop = sqrt(pow(rel_error_rho_right_loop, 2) + pow(rel_error_theta_right_loop, 2));
+       		// If the cost is lower than the previous, save the line as the correct one.
+       		if(cost_right_loop < cost_right)
+       		{
+         		index_minimal_cost_right = i;
+         		cost_right = cost_right_loop;
+       		}
+      	}
+      	// Update right.
+      	this->right_line_cropped_[0] = lines_right[index_minimal_cost_right][0];
+      	this->right_line_cropped_[1] = lines_right[index_minimal_cost_right][1];
+      	this->update_counter_right_ = 0;
+    }
+    else
+    {
+     	// No update for right line.
+      	this->update_counter_right_ += 1;
+    }
+  }
+  else
+  {
+  	// No lines were updated.
+    this->update_counter_left_ += 1;
+    this->update_counter_right_ += 1;
+    std::cout<<"No lines found at all!"<<std::endl;
+  }
 }
   
 // PRIVATE MEMBER METHODS.

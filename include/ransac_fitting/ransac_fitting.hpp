@@ -17,7 +17,6 @@ Output shall be: Parameters of the fitted function.
 using namespace cv;
 //cv::Point2f init_points[4];
 
-
 // This struct stores all required informations of a specific consensus set.
 struct Consensus
 {

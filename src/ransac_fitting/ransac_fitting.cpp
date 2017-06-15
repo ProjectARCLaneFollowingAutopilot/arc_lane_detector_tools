@@ -135,7 +135,7 @@ Point2f Ransac::getRandomPoint()
 float Ransac::getDistancePointToPolynom(Point2f point, vector<float> polynom_coeff)
 {
 	// Iterate discretely through the polynomial to find the nearest point to the curve.
-	float resolution = 1.0;
+	float resolution = 0.5;
 	float minimal_distance = 1000.0;
 	//for(float x = this->x_min_dataset_; x < this->x_max_dataset_; x = x + resolution)
 	for(float x = -350; x < 350; x = x + resolution)
@@ -181,17 +181,7 @@ float Ransac::getDistancePointToPolynom(Point2f point, vector<float> polynom_coe
  		A(i, 3) = 1;
  		b[i] = y;
  	}
-
- 	/*
- 	// Transpose A.
- 	A_trans =  A.transpose();
- 	// Calculate L.
- 	L = A_trans*A;
- 	// Calculate R.
- 	R = A_trans*b;
-
-   	Eigen::Vector4f coeff = L.colPivHouseholderQr().solve(R);
-	*/
+ 	
 	Eigen::Vector4f coeff = A.jacobiSvd(Eigen::ComputeThinU|Eigen::ComputeThinV).solve(b);
    	vector<float> coeff_copy;
 
