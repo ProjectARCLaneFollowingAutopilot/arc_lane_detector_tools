@@ -47,11 +47,11 @@ void IPM::setParam(float camera_height_m, float pitch_angle_deg, float focal_len
   std::cout<<"Height in Pixel "<<input_height_px<<std::endl;
 
   // The user has to choose four points in the input image which definately are on the ground plane.
-  this->setCtrlPts();
+  //this->setCtrlPts();
 
   // Calculate the homography matrix.
   //this->setTransformationMatrix();
-  this->setTransformationMatrix(1);
+  //this->setTransformationMatrix(1);
 }
 
 // Method to prompt the user to set input control points.
@@ -110,11 +110,13 @@ cv::Point2f IPM::image2Local(cv::Point2f image_coordinate)
 
   // Find lambda from equation (7).
   float lambda = (this->camera_height_m_)/((this->focal_length_px_)*cos(alpha_rad) -  v*sin(alpha_rad));
+  std::cout<<"Lambda: "<<lambda<<std::endl;
   // Project pixel from src_points_ to x,y (in world frame) onto ground plane (z = 0) using equation (6) and save to dst_points_cartesian.
   x_ground = 0.0 + lambda*(v*cos(alpha_rad) + (this->focal_length_px_)*sin(alpha_rad));
   y_ground = 0.0 - lambda*u;
   ground_point_cartesian.x = x_ground;
   ground_point_cartesian.y = y_ground;
+  return ground_point_cartesian;
 }
 
 
