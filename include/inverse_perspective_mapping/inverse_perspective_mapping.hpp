@@ -8,13 +8,14 @@ In order to work, the position and orientation of the camera w.r.t the ground pl
 #include <cv.h>
 #include <iostream>
 #include "opencv2/highgui/highgui.hpp"
+#include "../../include/constants.hpp"
+
 
 // GENERAL FUNCTIONS.
 // Callback function for setMouseCallback and returns the point clicked on.
 void getClickedPixel(int event, int x, int y, int flags, void *ptr);
 
 // CONSTANTS.
-const float PI = 3.14159265;
 
 class IPM
 {
@@ -66,7 +67,6 @@ class IPM
   cv::Point2f dst_points_[4];
   // Matrix to store the homography matrix.
   cv::Mat perspective_transform_;
-
 };
 
 /* Used codes
