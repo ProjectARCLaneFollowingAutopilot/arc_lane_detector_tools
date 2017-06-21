@@ -43,9 +43,6 @@ void IPM::setParam(float camera_height_m, float pitch_angle_deg, float focal_len
   this->input_width_px_ = input_width_px;
   this->input_height_px_ = input_height_px;
 
-  std::cout<<"Width in Pixel "<<input_width_px<<std::endl;
-  std::cout<<"Height in Pixel "<<input_height_px<<std::endl;
-
   // The user has to choose four points in the input image which definately are on the ground plane.
   //this->setCtrlPts();
 
@@ -66,12 +63,10 @@ void IPM::setCtrlPts()
   for(int i=0; i<4; i++)
   {
     std::cout<<"Point: "<<i+1<<" out of "<<4<<std::endl;
-    std::cout<<"You have now 5 sec to click on your point"<<std::endl;
+    std::cout<<"You have now 10 sec to click on your point"<<std::endl;
     cv::imshow("Display", input_img_);
     cv::setMouseCallback("Display", getClickedPixel, &p);
-    cv::waitKey(5000);
-    std::cout<<"Saved pixels: "<<std::endl;
-    std::cout<<p<<std::endl;
+    cv::waitKey(10000);
     this->src_points_[i] = p;
     std::cout<<"Input Points saved!"<<std::endl;
   }
@@ -110,7 +105,6 @@ cv::Point2f IPM::image2Local(cv::Point2f image_coordinate)
 
   // Find lambda from equation (7).
   float lambda = (this->camera_height_m_)/((this->focal_length_px_)*cos(alpha_rad) -  v*sin(alpha_rad));
-  std::cout<<"Lambda: "<<lambda<<std::endl;
   // Project pixel from src_points_ to x,y (in world frame) onto ground plane (z = 0) using equation (6) and save to dst_points_cartesian.
   x_ground = 0.0 + lambda*(v*cos(alpha_rad) + (this->focal_length_px_)*sin(alpha_rad));
   y_ground = 0.0 - lambda*u;

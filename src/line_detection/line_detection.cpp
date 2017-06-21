@@ -17,6 +17,7 @@ void getClickedPixel(int event, int x, int y, int flags, void *ptr)
 // DONE & TESTED: Standard constructor.
 LineDetector::LineDetector()
 {
+  namedWindow( "Detected Lane Cropped", WINDOW_AUTOSIZE );
 	std::cout<<"Line Detector created!"<<std::endl;
 }
 // DONE & TESTED: Standard destructor.
@@ -59,7 +60,7 @@ void LineDetector::setImage(Mat &new_image)
 	}
 }
 
- // WORK IN PROGRESS: Method which forces to detect lines, does filtering and saves two lines-->master function.
+ // DONE: Method which forces to detect lines, does filtering and saves two lines-->master function.
 void LineDetector::doLineDetection()
 {
 	// Find lines in the cropped image and save them.
@@ -68,6 +69,12 @@ void LineDetector::doLineDetection()
 	this->LineDetector::resetToDefault();
 	// Filter the cropped lines out to only find two lines and save.
 	this->LineDetector::filterLines2();
+
+  Mat show_big = this->original_.clone();
+  drawTwoLinesOriginal(show_big);
+  imshow("Result", show_big);
+  waitKey(1);
+
 }
 
 // DONE: Get the coordinates (LB, LT, RB, RT) of the two lines in the original image.
@@ -96,7 +103,23 @@ vector<Point2f> LineDetector::getLineCoordinates()
   	right_bottom_dst.y = 420.0;
 
   	vector<Point2f> result;
-  	result.push_back(left_bottom_dst);
+  	// Signal if lines shall be drawn.
+    if(!(this->draw_left_))
+    {
+      left_bottom_dst.x = -1;
+      left_bottom_dst.y = -1;
+      left_top_dst.x = -1;
+      left_top_dst.y = -1;
+    }
+    if(!(this->draw_right_))
+    {
+      right_bottom_dst.x = -1;
+      right_bottom_dst.y = -1;
+      right_top_dst.x = -1;
+      right_top_dst.y = -1;
+    }
+
+    result.push_back(left_bottom_dst);
   	result.push_back(left_top_dst);
   	result.push_back(right_bottom_dst);
   	result.push_back(right_top_dst);
@@ -104,7 +127,7 @@ vector<Point2f> LineDetector::getLineCoordinates()
   	return result;
 }
 
-// WORK IN PROGRESS: Method which clears variables for a next image.
+// DONE: Method which clears variables for a next image.
 void LineDetector::clearUp()
 {
   	this->all_lines_cropped_.clear();
@@ -143,9 +166,6 @@ vector<Vec2f> LineDetector::findAllLines(Mat &lines_to_find)
   	vector<Vec2f> h_c = houghClassic (lines_to_find);
   	vector<Vec2f> g_p = grayProperty(lines_to_find);
   	vector<Vec2f> c_g = compareGray (lines_to_find);
-
-    imshow("lines to find", lines_to_find);
-    waitKey(1);
 
   	// Append all vectors.
   	vector<Vec2f> all_detected_lines;
@@ -264,7 +284,6 @@ void LineDetector::filterLines2()
         		float del_y = std::abs(this->cropped_.rows);
         		float m = del_y/del_x;
         		float alpha = std::atan(m)*180.0/PI;
-            std::cout<<"Alpha"<<alpha<<std::endl;
         		if((std::abs(alpha - this->alpha_deg_) < this->del_alpha_limit_))
         		{
           			lines_left.push_back(lines[i]);
@@ -277,8 +296,6 @@ void LineDetector::filterLines2()
         		float del_y = std::abs(this->cropped_.rows);
         		float m = del_y/del_x;
         		float beta = std::atan(m)*180.0/PI;
-                        std::cout<<"Beta"<<beta<<std::endl;
-
         		if((std::abs(beta - this->beta_deg_) < this->del_beta_limit_))
         		{
           			lines_right.push_back(lines[i]);
@@ -424,8 +441,6 @@ void LineDetector::setDefaultLines(Mat &new_image)
     	imshow("Set Control Points", new_image);
     	setMouseCallback("Set Control Points", getClickedPixel, &p);
     	waitKey(10000);
-    	std::cout<<"Saved pixels: "<<std::endl;
-    	std::cout<<p<<std::endl;
     	init_points[i] = p;
     	std::cout<<"Input Points saved!"<<std::endl;
   	}
@@ -602,27 +617,47 @@ Point2f LineDetector::coordinateCrop2Orig(Point2f coord_crop)
 	Point2f coord_orig(coord_crop.x + this->cropping_corners_[0].x, coord_crop.y + this->cropping_corners_[0].y);
 	return coord_orig;
 }
-
-// DONE: Draws lines to an image (both have to have the same coordinate system!).
-void LineDetector::drawLines2Image(Mat &draw_to, vector<Vec2f> &lines_to_draw)
+// Show filtered hough lines in original image.
+void LineDetector::drawTwoLinesOriginal(Mat image_to_draw)
 {
-	for(int i = 0; i < lines_to_draw.size(); i++)
-	{
-		float rho = lines_to_draw[i][0];
-		float theta = lines_to_draw[i][1];
-		Point pt1;
-		Point pt2;
-		double a = cos(theta);
-		double b = sin(theta);
-		double x0 = a*rho;
-		double y0 = b*rho;
-		pt1.x = cvRound(x0 + 1000*(-b));
-		pt1.y = cvRound(y0 + 1000*(a));
-		pt2.x = cvRound(x0 - 1000*(-b));
-		pt2.y = cvRound(y0 - 1000*(a));
-		line(draw_to, pt1, pt2, Scalar(255, 0, 0), 3, CV_AA);
-	}
+  Mat src_roi = this->cropped_.clone();
+  float theta_left_rad = this->left_line_cropped_[1];
+  float theta_right_rad = this->right_line_cropped_[1];
+  float rho_left = this->left_line_cropped_[0];
+  float rho_right = this->right_line_cropped_[0];
+  // Draw the lines into original image.
+  // Calculate point coordinates (cartesian) where the lines cross the upper and lower horizontal limitation of the cropped image.
+  float y_top = 40.0;
+  float y_bottom = src_roi.rows;
+  float x_top_left = rho_left*cos(theta_left_rad) - sin(theta_left_rad)*((y_top - rho_left*sin(theta_left_rad))/(cos(theta_left_rad)));
+  float x_bottom_left = rho_left*cos(theta_left_rad) - sin(theta_left_rad)*((y_bottom - rho_left*sin(theta_left_rad))/(cos(theta_left_rad)));
+  float x_top_right = rho_right*cos(theta_right_rad) - sin(theta_right_rad)*((y_top - rho_right*sin(theta_right_rad))/(cos(theta_right_rad)));
+  float x_bottom_right = rho_right*cos(theta_right_rad) - sin(theta_right_rad)*((y_bottom - rho_right*sin(theta_right_rad))/(cos(theta_right_rad)));
+
+  Point2f left_top_dst;
+  Point2f left_bottom_dst;
+  Point2f right_top_dst;
+  Point2f right_bottom_dst;
+
+  left_top_dst.x = x_top_left;
+  left_top_dst.y = 290;       //250.0;
+  left_bottom_dst.x = x_bottom_left;
+  left_bottom_dst.y = 420.0;
+  right_top_dst.x = x_top_right;
+  right_top_dst.y = 290;          //250.0;
+  right_bottom_dst.x = x_bottom_right;
+  right_bottom_dst.y = 420.0;
+
+  if(this->draw_left_ == true)
+  {
+      line(image_to_draw, left_top_dst, left_bottom_dst, Scalar(0, 255, 0), 3, CV_AA);
+  }
+  if(this->draw_right_ == true)
+  {
+    line(image_to_draw, right_top_dst, right_bottom_dst, Scalar(0, 255, 0), 3, CV_AA);
+  }
 }
+
 
  // DONE: Displays the image in a window.
 void LineDetector::showImage(Mat show, string name)

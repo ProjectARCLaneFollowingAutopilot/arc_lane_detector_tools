@@ -75,8 +75,8 @@ class LineDetector
   Point2f coordinateOrig2Crop(Point2f coord_orig);
   // DONE: Method which transforms a point coordinate from cropped to original image.
   Point2f coordinateCrop2Orig(Point2f coord_crop);
-  // DONE: Draws lines to an image (both have to have the same coordinate system!) by getting a vector with (rho, theta).
-  void drawLines2Image(Mat &draw_to, vector<Vec2f> &lines_to_draw);
+  // Show filtered hough lines in original image.
+  void drawTwoLinesOriginal(Mat image_to_draw);
   // DONE: Displays the image in a window.
   void showImage(Mat show, string name);
 

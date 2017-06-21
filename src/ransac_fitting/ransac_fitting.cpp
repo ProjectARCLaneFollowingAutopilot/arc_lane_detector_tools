@@ -72,7 +72,6 @@ vector<float> Ransac::getRansacCoeff()
 			}
 			consensus_set_temp.size_cons_set = consensus_set_temp.cons_set.size();
 		}
-		std::cout<<"Temp cons set size: "<<consensus_set_temp.size_cons_set<<std::endl;
 		// Append the consensus set vector with the just found consensus set struct.
 		if(consensus_set_temp.size_cons_set > this->min_size_consensus_)
 		{
