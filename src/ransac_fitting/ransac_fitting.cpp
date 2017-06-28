@@ -1,18 +1,18 @@
 #include "../../include/ransac_fitting/ransac_fitting.hpp"
 
 // PUBLIC MEMBER METHODS.
-// DONE & TESTED: Standard constructor.
+// Standard constructor.
 Ransac::Ransac()
 {
 	std::srand(std::time(0)); // use current time as seed for random generator
 	std::cout<<"RANSAC Object created!"<<std::endl;
 }
-// DONE & TESTED: Standard destructor.
+// Standard destructor.
 Ransac::~Ransac()
 {
 	std::cout<<"RANSAC Object destroyed!"<<std::endl;
 }
-// DONE & TESTED: Method to assign new data points.
+// Method to assign new data points.
 void Ransac::setRansacDataSet(vector<cv::Point2f> &data_set)
 {
 	// Copy the dataset.
@@ -36,7 +36,7 @@ void Ransac::setRansacDataSet(vector<cv::Point2f> &data_set)
 	this->x_max_dataset_ = x_max_dataset;
 }
 
-// DONE & TESTED: Method to set the parameters of the RANSAC Algorithm (threshholds, number of iterations,...).
+// Method to set the parameters of the RANSAC Algorithm (threshholds, number of iterations,...).
 void Ransac::setRansacParams(float max_inlier_distance, int max_num_of_iterations, int min_size_consensus)
 {
 	this->max_inlier_distance_ = max_inlier_distance;
@@ -44,7 +44,7 @@ void Ransac::setRansacParams(float max_inlier_distance, int max_num_of_iteration
 	this->min_size_consensus_ = min_size_consensus;
 }
 
-// DONE & TESTED: Method which does the RANSAC algorithm and returns the found polynomial parameters -->Master function.
+// Method which does the RANSAC algorithm and returns the found polynomial parameters -->Master function.
 vector<float> Ransac::getRansacCoeff()
 {
 	// Loop as many times as previously defined to generate the consensus sets.
@@ -105,15 +105,14 @@ void Ransac::clearUp()
 
 // PRIVATE MEMBER METHODS.
 
-// DONE & TESTED: Method which choses a random points from the data set.
+// Method which choses a random points from the data set.
 Point2f Ransac::getRandomPoint()
 {
 	int random_index = std::rand() % this->data_set_.size();  
 	return this->data_set_[random_index];
 }
 
- // DONE & TESTED: Method which takes exactly the required number of points fits the polynom (-->fully determined) and returns the coefficients.
- // !!!Eigentlich könnte diese Funktion auch mit getCoeffLSQ gemacht werden!!!
+ //  Method which takes exactly the required number of points fits the polynom (-->fully determined) and returns the coefficients.
  vector<float> Ransac::getCoeffDet(vector<Point2f> det_points)
  {
  	Eigen::Matrix4f A;
@@ -129,8 +128,7 @@ Point2f Ransac::getRandomPoint()
   	return coeff_copy;
  }
 
-// DONE & TESTED: Method which returns the absolute distance from a given polynomial. 
-// !!! Effizienter wäre es für einen random set an Punkten das Polynom nur einmal zu diskretisieren!!!
+// Method which returns the absolute distance from a given polynomial. 
 float Ransac::getDistancePointToPolynom(Point2f point, vector<float> polynom_coeff)
 {
 	// Iterate discretely through the polynomial to find the nearest point to the curve.
@@ -155,7 +153,7 @@ float Ransac::getDistancePointToPolynom(Point2f point, vector<float> polynom_coe
 	return minimal_distance;
 }
 
- // DONE & TESTED: Method, which takes more than the required number of points, fits the polynom using LSQ (-->over determined) and returns the parameters.
+ // Method, which takes more than the required number of points, fits the polynom using LSQ (-->over determined) and returns the parameters.
  vector<float> Ransac::getCoeffLSQ(vector<Point2f> over_det_points)
  {
  	// Create matrix A.

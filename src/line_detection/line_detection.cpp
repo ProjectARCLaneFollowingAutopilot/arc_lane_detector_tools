@@ -1,7 +1,7 @@
 #include "../../include/line_detection/line_detection.hpp"
 
 // GENERAL FUNCTIONS.
-// DONE & TESTED: Callback function for setMouseCallback and returns the point clicked on.
+// Callback function for setMouseCallback and returns the point clicked on.
 void getClickedPixel(int event, int x, int y, int flags, void *ptr)
 {
   if(event == cv::EVENT_LBUTTONDOWN)
@@ -14,18 +14,18 @@ void getClickedPixel(int event, int x, int y, int flags, void *ptr)
 }
 
 // PUBLIC MEMBER METHODS.
-// DONE & TESTED: Standard constructor.
+// Standard constructor.
 LineDetector::LineDetector()
 {
   namedWindow( "Detected Lane Cropped", WINDOW_AUTOSIZE );
 	std::cout<<"Line Detector created!"<<std::endl;
 }
-// DONE & TESTED: Standard destructor.
+// Standard destructor.
 LineDetector::~LineDetector()
 {
 	std::cout<<"Line Detector destroyed!"<<std::endl;
 }
-// DONE: Define all parameters: ROI-Cropping corners...
+// Define all parameters: ROI-Cropping corners...
 void LineDetector::setParams(Point2f roi_left_top, Point2f roi_right_bottom)
 {
   this->update_counter_left_ = 0;
@@ -43,7 +43,7 @@ void LineDetector::setParams(Point2f roi_left_top, Point2f roi_right_bottom)
 
 	this->init_counter_ = 0;
 }
-// DONE & TESTED: Set a new original and cropped image.
+// Set a new original and cropped image.
 void LineDetector::setImage(Mat &new_image)
 {
 	// Reset all data from previous iteration.
@@ -60,7 +60,7 @@ void LineDetector::setImage(Mat &new_image)
 	}
 }
 
- // DONE: Method which forces to detect lines, does filtering and saves two lines-->master function.
+ // Method which forces to detect lines, does filtering and saves two lines-->master function.
 void LineDetector::doLineDetection()
 {
 	// Find lines in the cropped image and save them.
@@ -77,7 +77,7 @@ void LineDetector::doLineDetection()
 
 }
 
-// DONE: Get the coordinates (LB, LT, RB, RT) of the two lines in the original image.
+// Get the coordinates (LB, LT, RB, RT) of the two lines in the original image.
 vector<Point2f> LineDetector::getLineCoordinates()
 {
 	// Calculate point coordinates (cartesian) where the lines cross the upper and lower horizontal limitation of the cropped image.
@@ -127,14 +127,14 @@ vector<Point2f> LineDetector::getLineCoordinates()
   	return result;
 }
 
-// DONE: Method which clears variables for a next image.
+// Method which clears variables for a next image.
 void LineDetector::clearUp()
 {
   	this->all_lines_cropped_.clear();
 }
 
 // Helper methods:
-// DONE: Does the Hough-Transform, gives lines and draws the lines.
+// Does the Hough-Transform, gives lines and draws the lines.
 void LineDetector::houghTransform(Mat &contours, Mat &draw_to, vector<Vec2f> &lines_ht, int threshold)
 {
   //Hough transform. Parameter to be determined.
@@ -159,7 +159,7 @@ void LineDetector::houghTransform(Mat &contours, Mat &draw_to, vector<Vec2f> &li
 }
   
 // PRIVATE MEMBER METHODS.
-// WORK IN PROGRESS: Method which finds all lines in an image, using a combination of different line finding methods.
+// Method which finds all lines in an image, using a combination of different line finding methods.
 vector<Vec2f> LineDetector::findAllLines(Mat &lines_to_find)
 {
 	// Do several Hough transforms.
@@ -178,7 +178,7 @@ vector<Vec2f> LineDetector::findAllLines(Mat &lines_to_find)
 }
 
 // Line finding methods:
-// DONE: ???
+//
 vector<Vec2f> LineDetector::houghClassic(Mat src_hc)
 {
   Mat src_hc_roi_filtered = src_hc.clone();
@@ -192,27 +192,24 @@ vector<Vec2f> LineDetector::houghClassic(Mat src_hc)
   return lines_hc;
 }
 
-// DONE: ???
+//
 vector<Vec2f> LineDetector::grayProperty(Mat src_gp)
 {
   Mat src_gp_copy = src_gp.clone();
   vector<Vec2f> lines_gp;
   Mat contours(src_gp.rows, src_gp.cols, CV_8UC1);
-  //Find gray areas using the function FindGray.
   Mat gray = this->LineDetector::findGray(src_gp_copy);
   Canny(gray, contours, 180, 180);
-  //Sobel(gray, contours, CV_16S, 1, 0, 3);
   houghTransform(contours, src_gp_copy, lines_gp, 30);
   return lines_gp;
 }
 
-// DONE: ???
+//
 vector<Vec2f> LineDetector::compareGray(Mat src_cg)
 {
   vector<Vec2f> lines_cg;
   Mat src_cg_copy = src_cg.clone();
   Mat color_contour = src_cg_copy.clone();
-  //Calculate Canny-image by using the function roadThreshold;
   Canny(this->LineDetector::roadThreshold(src_cg_copy),  color_contour, 30, 50);
   Mat show_color_hough = src_cg_copy.clone();
   houghTransform(color_contour, show_color_hough, lines_cg, 30);
@@ -483,7 +480,7 @@ void LineDetector::setDefaultLines(Mat &new_image)
     this->beta_default_ = this->beta_deg_;
 }
 
-// DONE: ???
+// 
 Mat LineDetector::roadThreshold(Mat src_rt)
 {
 	// Calculate the intensity of areas by using the function IntensityOfArea.
@@ -499,40 +496,45 @@ Mat LineDetector::roadThreshold(Mat src_rt)
 	black[2] = 0;
 	// Define white vector.
 	Vec3b white;
-	black[0] = 255;
-	black[1] = 255;
-	black[2] = 255;
+	white[0] = 255;
+	white[1] = 255;
+	white[2] = 255;
 	// Iterate through the whole image.
 	for(int y = 0; y < src_rt.rows; y++)
 	{
  		for(int x = 0; x < src_rt.cols; x++)
   		{
 			// Calculate the deviation of the intensity. 
-    		Vec3b color = src_rt.at<Vec3b>(Point(x,y));
+    	Vec3b color = src_rt.at<Vec3b>(Point(x,y));
 			float b_delta_sq = ((color[0] - b_average)/b_average)*((color[0] - b_average)/b_average);
 			float g_delta_sq = ((color[1] - g_average)/g_average)*((color[1] - g_average)/g_average);
 			float r_delta_sq = ((color[2] - r_average)/r_average)*((color[2] - r_average)/r_average);
 			// Threshold the image.
-			if ( (b_delta_sq < 0.05) && (g_delta_sq < 0.05) && (r_delta_sq < 0.05))
-			{
-				src_rt.at<Vec3b>(Point(x,y)) = black;
-			}
-			else
+			if ( (b_delta_sq < 0.08) && (g_delta_sq < 0.08) && (r_delta_sq < 0.08))
 			{
 				src_rt.at<Vec3b>(Point(x,y)) = white;
 			}
+			else
+			{
+				src_rt.at<Vec3b>(Point(x,y)) = black;
+			}
 		}
 	}
-	return src_rt;
+
+  Mat src_rt_u(src_rt.rows, src_rt.cols, CV_8U);
+  Mat src_rt_u_filtered(src_rt.rows, src_rt.cols, CV_8U);
+  cvtColor(src_rt, src_rt_u, cv::COLOR_RGB2GRAY);
+  medianBlur(src_rt_u, src_rt_u_filtered, 15);  
+  return src_rt_u_filtered;
 }
 
-// DONE: ???
+// 
 Vec3b LineDetector::intensityOfArea(Mat &src_ioa, int x_gray, int y_gray, int width_gray, int height_gray)
 {
 	Mat src = this->original_.clone(); // Added by Nikku.
 	// This function calculate the averaged intensity of alle color-channels of a fixed region of a image.
 	Rect region_gray = Rect(x_gray, y_gray, width_gray, height_gray);
-	rectangle(src_ioa, region_gray, Scalar(0, 255, 0));
+	rectangle(src_ioa, region_gray, Scalar(255, 255, 255), 10);
   Mat src_gray = src(region_gray);
 	float b_average = 0;
 	float g_average = 0;
@@ -557,11 +559,10 @@ Vec3b LineDetector::intensityOfArea(Mat &src_ioa, int x_gray, int y_gray, int wi
 	return intensity;
 }
 
-// DONE: ???
+// 
 Mat LineDetector::findGray(Mat src_fg)
 {
 	Mat blur = src_fg.clone();
-	// medianBlur(src, blur, 7);
 	Mat result(src_fg.rows, src_fg.cols, CV_8UC1);
 	int sum;
 	for(int y = 0; y < src_fg.rows; y++)
@@ -583,7 +584,8 @@ Mat LineDetector::findGray(Mat src_fg)
 		result.at<uchar>(Point(x,y)) = sum;
 		}
 	}
-	medianBlur(result, blur, 7);
+  threshold(result, blur, 35, 255, THRESH_BINARY);
+	medianBlur(blur, blur, 15);
 	return blur;
 }
 
@@ -604,14 +606,14 @@ Mat LineDetector::findGray(Mat src_fg)
   	return theta_and_rho;
  }
 
-// DONE: Method which transforms a point coordinate from original to cropped image.
+// Method which transforms a point coordinate from original to cropped image.
 Point2f LineDetector::coordinateOrig2Crop(Point2f coord_orig)
 {
 	Point2f coord_crop(coord_orig.x - this->cropping_corners_[0].x, coord_orig.y - this->cropping_corners_[0].y);
 	return coord_crop;
 }
 
-// DONE: Method which transforms a point coordinate from cropped to original image.
+// Method which transforms a point coordinate from cropped to original image.
 Point2f LineDetector::coordinateCrop2Orig(Point2f coord_crop)
 {
 	Point2f coord_orig(coord_crop.x + this->cropping_corners_[0].x, coord_crop.y + this->cropping_corners_[0].y);
@@ -664,5 +666,5 @@ void LineDetector::showImage(Mat show, string name)
 {
 	namedWindow(name, CV_WINDOW_AUTOSIZE);
 	imshow(name, show);
-  	waitKey(1);
+  waitKey(1);
 }
