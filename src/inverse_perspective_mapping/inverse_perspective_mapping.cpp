@@ -44,11 +44,11 @@ void IPM::setParam(float camera_height_m, float pitch_angle_deg, float focal_len
   this->input_height_px_ = input_height_px;
 
   // The user has to choose four points in the input image which definately are on the ground plane.
-  //this->setCtrlPts();
+  this->setCtrlPts();
 
   // Calculate the homography matrix.
   //this->setTransformationMatrix();
-  //this->setTransformationMatrix(1);
+  this->setTransformationMatrix(1);
 }
 
 // Method to prompt the user to set input control points.
@@ -57,12 +57,11 @@ void IPM::setCtrlPts()
   // Let user select the input points.
   cv::Point2f p;
   cv::namedWindow("Display", CV_WINDOW_AUTOSIZE);
-
   // Prompt user to select four points in perspectively distorted input image of the groundplane.
   std::cout<<"Selecting Input Points on ground plane"<<std::endl;
-  for(int i=0; i<4; i++)
+  for(int i = 0; i < 4; i++)
   {
-    std::cout<<"Point: "<<i+1<<" out of "<<4<<std::endl;
+    std::cout<<"Point: "<<i + 1<<" out of "<<4<<std::endl;
     std::cout<<"You have now 10 sec to click on your point"<<std::endl;
     cv::imshow("Display", input_img_);
     cv::setMouseCallback("Display", getClickedPixel, &p);
@@ -172,7 +171,7 @@ void IPM::setTransformationMatrix()
 // Method which uses four predefined points on the input image, uses equation (6) to project and then gets and sets the transformation matrix.
 void IPM::setTransformationMatrix(bool some_variable)
 {
-  std::cout<<"New method was called"<<std::endl;
+  std::cout<<"Bool method was called"<<std::endl;
   // Variable which stores the actual cartesian coordinates of the input points' projection on the ground plane. In world coordinates!
   cv::Point2f dst_points_cartesian[4];
   float x_ground = 0.0;
