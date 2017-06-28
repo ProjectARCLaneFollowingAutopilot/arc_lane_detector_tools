@@ -1,9 +1,5 @@
 #pragma once
-/* DESCRIPTION:
-This class offers method to find lines in an image, using different image processing methods.
-However, all are based on the hough line transform, but the images are preprocessed differently.
-At the end, the algorithm should return only two lines.
-*/
+
 #include <cmath>
 #include <cv.h>
 #include <Eigen/Dense>

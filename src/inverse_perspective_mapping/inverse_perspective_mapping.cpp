@@ -146,7 +146,6 @@ void IPM::setTransformationMatrix()
   }
   cv::destroyWindow("Set Output Points");
 
-
   // Assign the destination points from the two diagonal points, the user selected.
   // Use a square template, which is easier to calibrate.
   this->dst_points_[0] = diagonal_elements[0];

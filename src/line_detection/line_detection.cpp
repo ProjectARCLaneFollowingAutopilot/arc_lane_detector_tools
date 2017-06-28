@@ -659,8 +659,7 @@ void LineDetector::drawTwoLinesOriginal(Mat image_to_draw)
   }
 }
 
-
- // DONE: Displays the image in a window.
+// Displays the image in a window.
 void LineDetector::showImage(Mat show, string name)
 {
 	namedWindow(name, CV_WINDOW_AUTOSIZE);

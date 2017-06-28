@@ -1,9 +1,5 @@
 #pragma once
-/* DESCRIPTION:
-Use this class to fit a 2nd order polynomial to a set of points.
-Input shall be: Set of points, number of iterations, thresholds.
-Output shall be: Parameters of the fitted function.
-*/
+
 #include <cmath>
 #include <cstdlib>
 #include <ctime>
@@ -15,7 +11,6 @@ Output shall be: Parameters of the fitted function.
 #include "opencv2/highgui/highgui.hpp"
 
 using namespace cv;
-//cv::Point2f init_points[4];
 
 // This struct stores all required informations of a specific consensus set.
 struct Consensus
@@ -34,30 +29,28 @@ class Ransac
 {
   public:
   // PUBLIC MEMBER METHODS.
-  // DONE & TESTED: Standard constructor.
+  // Standard constructor.
   Ransac();
-  // DONE & TESTED: Standard destructor.
+  // Standard destructor.
   ~Ransac();
-  // DONE & TESTED: Method to assign new data points and also sets x_min_dataset_ and x_max_dataset_;
+  // Method to assign new data points and also sets x_min_dataset_ and x_max_dataset_;
   void setRansacDataSet(vector<cv::Point2f> &data_set);
-  // DONE & TESTED: Method to set the parameters of the RANSAC Algorithm (threshholds, number of iterations,...).
+  // Method to set the parameters of the RANSAC Algorithm (threshholds, number of iterations,...).
   void setRansacParams(float max_inlier_distance, int max_num_of_iterations, int min_size_consensus);
-  // DONE: Method which does the RANSAC algorithm and returns the found polynomial parameters -->Master function.
+  // Method which does the RANSAC algorithm and returns the found polynomial parameters -->Master function.
   vector<float> getRansacCoeff();
   // Method to clear up for the next fitting.
   void clearUp();
 
-  // PUBLIC MEMBER VARIABLES.
-
   private:
   // PRIVATE MEMBER METHODS.
-  // DONE & TESTED: Method which choses a random points from the data set.
+  // Method which choses a random points from the data set.
   Point2f getRandomPoint();
-  // DONE & TESTED: Method which takes exactly the required number of points fits the polynom (-->fully determined) and returns the coefficients.
+  // Method which takes exactly the required number of points fits the polynom (-->fully determined) and returns the coefficients.
   vector<float> getCoeffDet(vector<Point2f> det_points);  
-  // DONE & TESTED: Method which returns the absolute distance from a given polynomial.
+  // Method which returns the absolute distance from a given polynomial.
   float getDistancePointToPolynom(Point2f point, vector<float> polynom_coeff);
-  // DONE & TESTED: Method, which takes more than the required number of points, fits the polynom using LSQ (-->over determined) and returns the parameters.
+  // Method, which takes more than the required number of points, fits the polynom using LSQ (-->over determined) and returns the parameters.
   vector<float> getCoeffLSQ(vector<Point2f> over_det_points); 
   // Write the used consensus set to a text file.
   void writeLargestConsSetToFile();
@@ -79,5 +72,6 @@ class Ransac
   vector<Point2f> data_set_;
   // Vector of structs, storing all of the consensus set structs.
   vector<Consensus> all_cons_sets_;
+  // The consensus set with the most points.
   Consensus largest_consensus_set_;
 };

@@ -1,21 +1,14 @@
 #pragma once
-/* DESCRIPTION
- This class can be used to create an object, which will take an input image (perspectively distorted)
-and return a non-distorted image projected on the ground plane.
-In order to work, the position and orientation of the camera w.r.t the ground plane has to be known.
-*/
+
 #include <cmath>
 #include <cv.h>
 #include <iostream>
 #include "opencv2/highgui/highgui.hpp"
 #include "../../include/constants.hpp"
 
-
 // GENERAL FUNCTIONS.
 // Callback function for setMouseCallback and returns the point clicked on.
 void getClickedPixel(int event, int x, int y, int flags, void *ptr);
-
-// CONSTANTS.
 
 class IPM
 {
@@ -35,8 +28,6 @@ class IPM
   void setCtrlPts();
   // Method which transforms a single point and returns the coordinates in the vehicle frame.
   cv::Point2f image2Local(cv::Point2f image_coordinate);
-
-  // PUBLIC MEMBER VARIABLES.
 
   private:
   // PRIVATE MEMBER METHODS.
@@ -68,11 +59,3 @@ class IPM
   // Matrix to store the homography matrix.
   cv::Mat perspective_transform_;
 };
-
-/* Used codes
-http://opencvexamples.blogspot.com/2014/01/detect-mouse-clicks-and-moves-on-image.html
-http://docs.opencv.org/2.4/modules/core/doc/basic_structures.html
-http://answers.opencv.org/question/33756/destroy-a-mousecallback/
-http://opencvexamples.blogspot.com/2014/01/perspective-transform.html
-http://docs.opencv.org/2.4/modules/imgproc/doc/geometric_transformations.html#Mat%20getPerspectiveTransform(InputArray%20src,%20InputArray%20dst)
-*/
