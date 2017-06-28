@@ -74,7 +74,6 @@ void LineDetector::doLineDetection()
   drawTwoLinesOriginal(show_big);
   imshow("Result", show_big);
   waitKey(1);
-
 }
 
 // Get the coordinates (LB, LT, RB, RT) of the two lines in the original image.
@@ -456,8 +455,8 @@ void LineDetector::setDefaultLines(Mat &new_image)
     this->right_line_cropped_[0] = polar_parameters[1];
 
     // Set the initial values as default value.
-	this->default_left_ = this->left_line_cropped_;
-	this->default_right_ = this->right_line_cropped_;
+	  this->default_left_ = this->left_line_cropped_;
+	  this->default_right_ = this->right_line_cropped_;
 
   	// Calculate alpha and beta (gradient of the lines) and save them.
   	float rho_left = this->default_left_[0];
@@ -531,7 +530,7 @@ Mat LineDetector::roadThreshold(Mat src_rt)
 // 
 Vec3b LineDetector::intensityOfArea(Mat &src_ioa, int x_gray, int y_gray, int width_gray, int height_gray)
 {
-	Mat src = this->original_.clone(); // Added by Nikku.
+	Mat src = this->original_.clone(); 
 	// This function calculate the averaged intensity of alle color-channels of a fixed region of a image.
 	Rect region_gray = Rect(x_gray, y_gray, width_gray, height_gray);
 	rectangle(src_ioa, region_gray, Scalar(255, 255, 255), 10);
@@ -642,11 +641,11 @@ void LineDetector::drawTwoLinesOriginal(Mat image_to_draw)
   Point2f right_bottom_dst;
 
   left_top_dst.x = x_top_left;
-  left_top_dst.y = 290;       //250.0;
+  left_top_dst.y = 290;     
   left_bottom_dst.x = x_bottom_left;
   left_bottom_dst.y = 420.0;
   right_top_dst.x = x_top_right;
-  right_top_dst.y = 290;          //250.0;
+  right_top_dst.y = 290;        
   right_bottom_dst.x = x_bottom_right;
   right_bottom_dst.y = 420.0;
 
