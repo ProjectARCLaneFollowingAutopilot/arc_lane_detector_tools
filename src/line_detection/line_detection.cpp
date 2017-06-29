@@ -177,7 +177,7 @@ vector<Vec2f> LineDetector::findAllLines(Mat &lines_to_find)
 }
 
 // Line finding methods:
-//
+// Method for generating Lines - First blurs the image, Canny edge detector and Hough transform.
 vector<Vec2f> LineDetector::houghClassic(Mat src_hc)
 {
   Mat src_hc_roi_filtered = src_hc.clone();
@@ -191,7 +191,7 @@ vector<Vec2f> LineDetector::houghClassic(Mat src_hc)
   return lines_hc;
 }
 
-//
+// Method for generating Lines - Compares the three RGB channels for emphasising the road, and Hough of Canny image.
 vector<Vec2f> LineDetector::grayProperty(Mat src_gp)
 {
   Mat src_gp_copy = src_gp.clone();
@@ -203,7 +203,7 @@ vector<Vec2f> LineDetector::grayProperty(Mat src_gp)
   return lines_gp;
 }
 
-//
+// Method for generating Lines - Compares colour to the averaged colour of the road, and Hough of Canny image.
 vector<Vec2f> LineDetector::compareGray(Mat src_cg)
 {
   vector<Vec2f> lines_cg;
@@ -479,7 +479,7 @@ void LineDetector::setDefaultLines(Mat &new_image)
     this->beta_default_ = this->beta_deg_;
 }
 
-// 
+// Functions emphasises the road by comparing the road colour to every pixel.
 Mat LineDetector::roadThreshold(Mat src_rt)
 {
 	// Calculate the intensity of areas by using the function IntensityOfArea.
@@ -527,7 +527,7 @@ Mat LineDetector::roadThreshold(Mat src_rt)
   return src_rt_u_filtered;
 }
 
-// 
+// Function averages the intensity of a area for each colour channel. 
 Vec3b LineDetector::intensityOfArea(Mat &src_ioa, int x_gray, int y_gray, int width_gray, int height_gray)
 {
 	Mat src = this->original_.clone(); 
@@ -558,7 +558,7 @@ Vec3b LineDetector::intensityOfArea(Mat &src_ioa, int x_gray, int y_gray, int wi
 	return intensity;
 }
 
-// 
+// Filters an image binarily by comparing the different colour channels. 
 Mat LineDetector::findGray(Mat src_fg)
 {
 	Mat blur = src_fg.clone();
