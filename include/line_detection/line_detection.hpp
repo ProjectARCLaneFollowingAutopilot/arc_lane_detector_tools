@@ -18,62 +18,62 @@ class LineDetector
 {
   public:
   // PUBLIC MEMBER METHODS.
-  // DONE: Standard constructor.
+  // Standard constructor.
   LineDetector();
-  // DONE: Standard destructor.
+  // Standard destructor.
   ~LineDetector();
-  // DONE: Define some parameters: ROI-Cropping corners.
+  // Define some parameters: ROI-Cropping corners.
   void setParams(Point2f roi_left_top, Point2f roi_right_bottom);
-  // DONE: Set a new original and cropped image and also set default and initial values.
+  // Set a new original and cropped image and also set default and initial values.
   void setImage(Mat &new_image);
-  // DONE: Method which forces to detect lines, does filtering and saves two lines-->master function.
+  // Method which forces to detect lines, does filtering and saves two lines-->master function.
   void doLineDetection();
-  // DONE: Get the coordinates (LB, LT, RB, RT) of the two lines in the original image.
+  // Get the coordinates (LB, LT, RB, RT) of the two lines in the original image.
   vector<Point2f> getLineCoordinates();
-  // WORK IN PROGRESS: Method which clears variables for a next image.
+  // Method which clears variables for a next image.
   void clearUp();
 
   // Helper methods:
-  // DONE: Does the Hough-Transform and draws the lines.
+  // Does the Hough-Transform and draws the lines.
   void houghTransform(Mat &contours, Mat &draw_to, vector<Vec2f> &lines_ht, int threshold);
   
   private:
   // PRIVATE MEMBER METHODS.
-  // DONE: Method which finds all lines in an image, using a combination of different line finding methods.
+  // Method which finds all lines in an image, using a combination of different line finding methods.
   vector<Vec2f> findAllLines(Mat &lines_to_find);
   // Line finding methods:
-  // DONE: ???
+  // Method for generating Lines - First blurs the image, Canny edge detector and Hough transform.
   vector<Vec2f> houghClassic(Mat src_hc); 
-  // DONE: ???
+  // Method for generating Lines - Compares the three RGB channels for emphasising the road, and Hough of Canny image.
   vector<Vec2f> grayProperty(Mat src_gp);
-  // DONE: ???
+  // Method for generating Lines - Compares colour to the averaged colour of the road, and Hough of Canny image.
   vector<Vec2f> compareGray (Mat src_cg);
   // Heuristic filters.
-  // DONE: Method which decides if values shall be resetted.
+  // Method which decides if values shall be resetted.
   void resetToDefault();
   // Method which filters all lines to find and set only two lines (old approach).
-  //void filterLines1();
-  // DONE: Method which filters all lines to find and set only two lines (new approach).
+  void filterLines1();
+  // Method which filters all lines to find and set only two lines (new approach).
   void filterLines2();
 
   // Helper methods:
-  // DONE: Method to prompt the user to set four input control points, which are on the two lines and saves them.
+  // Method to prompt the user to set four input control points, which are on the two lines and saves them.
   void setDefaultLines(Mat &new_image);
-  // DONE: ???
+  // Functions emphasises the road by comparing the road colour to every pixel.
   Mat roadThreshold(Mat src_rt);
-  // DONE: ???
+  // Function averages the intensity of a area for each colour channel.
   Vec3b intensityOfArea(Mat &src_ioa, int x_gray, int y_gray, int width_gray, int height_gray);
-  // DONE: ???
+  // Filters an image binarily by comparing the different colour channels.
   Mat findGray(Mat src_fg);
-  // DONE Method which returns rho and theta of a line defined in the cartesian space.
+  // Method which returns rho and theta of a line defined in the cartesian space.
   Eigen::Vector2f cartesian2PolarLines(float x_a, float x_b, float y_a, float y_b);
-  // DONE: Method which transforms a point coordinate from original to cropped image.
+  // Method which transforms a point coordinate from original to cropped image.
   Point2f coordinateOrig2Crop(Point2f coord_orig);
-  // DONE: Method which transforms a point coordinate from cropped to original image.
+  // Method which transforms a point coordinate from cropped to original image.
   Point2f coordinateCrop2Orig(Point2f coord_crop);
   // Show filtered hough lines in original image.
   void drawTwoLinesOriginal(Mat image_to_draw);
-  // DONE: Displays the image in a window.
+  // Displays the image in a window.
   void showImage(Mat show, string name);
 
   // PRIVATE MEMBER VARIABLES.
