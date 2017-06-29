@@ -422,7 +422,7 @@ void LineDetector::filterLines2()
 }
 
 // Helper methods:
-// DONE: Method to prompt the user to set four input control points, which are on the two lines and saves them.
+// Method to prompt the user to set four input control points, which are on the two lines and saves them.
 void LineDetector::setDefaultLines(Mat &new_image)
 {
 	// The user shall select four points, which will then be used for setting the default line.
